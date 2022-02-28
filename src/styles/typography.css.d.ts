@@ -21,6 +21,7 @@ declare const styles: {
   readonly fontButton: string
   readonly fontNav: string
   readonly fontNowrap: string
+  readonly lineheightIsTight: string
   readonly isMonospace: string
   readonly isSemibold: string
   readonly isMedium: string
@@ -36,5 +37,6 @@ declare const styles: {
   readonly remarkEmoji: string
   readonly textIsCentered: string
   readonly buttonGroup: string
+  readonly width: string
 }
 export = styles

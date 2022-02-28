@@ -1,0 +1,903 @@
+---
+path: '/how-to-build-login-with-hacker-news/'
+
+title: |
+  How I built LoginWithHN using Ory Hydra
+
+teaser: |
+  How Vadosware built LoginWithHN, an OAuth2+OpenID Connect provider for HackerNews using the Ory Hydra open source project.
+
+seo:
+  title: |
+    Guide on how to build a custom OIDC provider for Hackernews using Ory Hydra
+  description: |
+    How I built LoginWithHN, an OAuth2+OpenID Connect provider for HackerNews using the Ory Hydra open source project.
+  keywords: |
+    login, auth, federation, hackernews, loginwithhn, registration, open source, ory, ory hydra
+  canonical: |
+    https://vadosware.io/post/how-i-built-lwhn/
+
+
+publishedAt: '2022-02-17'
+author: vadosware
+
+overline: |
+  Hacking with Ory Hydra
+tags:
+  - Guide
+  - Open Source
+  - Passwordless
+  - Federation
+  - Guest Author
+---
+
+**tl;dr - This post explains how I built
+[LoginWithHN.com (LWHN)](https://loginwithhn.com), an unofficial OAuth2+OpenID
+connect provider for [HackerNews](https://news.ycombinator.com). LWHN is for
+builders who want to share things with the HN audience, and cuts down friction
+like any other OAuth2+OpenID connect provider. LWHN is now open to the public
+for new client app registration, so check it out if you're interested.**
+
+_DISCLAIMER: I wrote this article with the knowledge that
+[Ory](https://www.ory.sh/) would share it later on their blog/marketing
+channels. Ory's product [Hydra](https://www.ory.sh/docs/hydra) powers LWHN's
+OAuth2+OpenID Connect integration and I wholeheartedly endorse it._
+
+## Login flows - How/When/What do?
+
+Login is often one of the last things I think about while building a new
+project. I've built the email + password flow so many times now that I can do it
+in my sleep:
+
+- Salted
+  [`bcrypt`](https://en.wikipedia.org/wiki/Bcrypt)/[`scrypt`](https://en.wikipedia.org/wiki/Scrypt)/etc
+  password hashes with high work (round) count
+- Email reset
+- `HTTPOnly` + `Secure` cookies with expiry
+- reasonable expiry length
+
+Most people would use a framework like Rails or Django here to save themselves
+the time but that's not my style (see rest of this blog).
+
+Anyway, instead of doing too much, one thing I don't do _enough_ of is thinking
+about login from a **user-centric point of view**. Case in point - **no one
+cares how secure your login is, they care that it's convenient**.
+
+It's a fine line - don't build insecure software (users don't like apps that
+leak all their data), but also don't bombard users with friction.
+
+**The right question is what kind of login flow will ~~spark joy~~ be least
+annoying for your users**.
+
+## Google? Twitter? Facebook? The community I want to build for is HackerNews
+
+I build a lot of projects/products with people who surf
+[HackerNews](https://news.ycombinator.com) in mind - it's one of the best
+moderated high traffic tech communities out there, full of people who are
+willing to be early adopters of projects and ideas.
+
+The secret is probably some combination of HN's stellar moderation team and
+maybe the focus/industry and the people it attracts. I'm not smart enough to
+understand completely _why_ HN is so good, but one thing I know is that I rate
+the random seasoned HN user's opinion over a lot of the rest of the internet,
+even when
+[most commenters on a topic are completely, hilariously wrong](https://news.ycombinator.com/item?id=8863),
+and routinely condescending/nitpicky.
+
+The mix of early adopters, people with fresh ideas (and many dragging around
+many stale-but-good ideas like [SQLite](https://sqlite.org) and
+[Postgres](https://www.postgresql.org)), is often the right people to pan rough
+drafts of ideas and apps.
+
+## How do people do easier login these days?
+
+Anyway, getting back to the task at hand - these days login has been
+federated/distributed for most social/non-social apps, thanks to a few different
+frameworks:
+
+- [Security Assertion Markup Language (SAML)](https://en.wikipedia.org/wiki/Security_Assertion_Markup_Language)
+- [Central Authentication Service (CAS)](https://en.wikipedia.org/wiki/Central_Authentication_Service))
+  - A bit different as authentication is centralized (it's in the name!), but
+    there are some federation features built in to later versions of the
+    protocol
+  - CAS is my personal favorite; v1 is simplest delegated Authentication
+    ("AuthN") you'll find, so simple that I actually did write a
+    [small CAS v1 implementation](https://github.com/t3hmrman/casgo)) a while
+    ago
+- [OAuth2](https://en.wikipedia.org/wiki/OAuth#OAuth_2.0) +
+  [OpenID Connect](<https://en.wikipedia.org/wiki/OpenID#OpenID_Connect_(OIDC)>)
+  - OAuth2 actually is an Authorization ("AuthZ") protocol; you only know what
+    someone can do as a given user, not that they _are_ a given user.
+  - OpenID Connect builds on OAuth2 to make it an AuthN protocol, by adding and
+    endpoint that answers the "who are you" question (`/openid`)
+
+**People are getting _very simple_ login flows by just dropping "Login with
+Google" or "Login with Twitter" buttons on their pages!** That's something I'd
+love when building products for HackerNews.
+
+Well, this is a short writeup on how I built
+[LoginWithHN](https://loginwithhn.com) (Spoiler alert: it's possible, and
+actually kind of an easy hack).
+
+## Step one: How much can I stretch OAuth2/OpenID Connect? (RTFM)
+
+As usual, it's good to
+[Read The Fucking Manual (RTFM)](https://en.wikipedia.org/wiki/RTFM) -- first I
+needed to make sure that it _makes sense_ to attempt to do what I'm trying to
+do. Simple questions:
+
+- Does the login method _have_ to be a password?
+- What are timelines like on token exchange?
+- How hard would this be to implement?
+- What technologies is most used for cross-site auth?
+
+If you're not an OAuth expert, try to read at least some of the guides on
+delegated AuthN/AuthZ below. I recommend starting with CAS, as it's the simplest
+and they all work very similarly.
+
+- [CAS Protocol v1 (Yale docs)](https://developers.yale.edu/cas-central-authentication-service)
+- [CAS Protocol v1/2/3](https://apereo.github.io/cas/6.2.x/protocol/CAS-Protocol-Specification.html)
+  - I personally didn't need a lot of the things in v2 & v3 but maybe someone
+    did.
+- [OAuth 2.0 simplified by OAuth.net](https://oauth.net/getting-started/)
+- [OAuth2 Concept guide by Ory](https://www.ory.sh/hydra/docs/concepts/oauth2/)
+- [An introduction to OAuth 2 by Digital Ocean](https://www.digitalocean.com/community/tutorials/an-introduction-to-oauth-2)
+- [An illustrated Guide to OAuth and OpenID Connect](https://developer.okta.com/blog/2019/10/21/illustrated-guide-to-oauth-and-oidc)
+- [OpenID Connect documentation](https://openid.net/connect/)
+- [Beginner's Guide to SAML by Okta](https://support.okta.com/help/s/article/Beginner-s-Guide-to-SAML?language=en_US)
+- [The Beer Drinker's Guide to SAML by Duo Security](https://duo.com/blog/the-beer-drinkers-guide-to-saml)
+
+After reading links above (or not) hopefully you come to the same conclusions I
+did:
+
+OAuth2 + OpenIDConnect is the obvious answer here - there's no requirement for
+the login credentials to be a username/password (that'd be silly), a username
+and password for (OAuth2 at least)
+
+## Step two: How should I do it?
+
+### The ground-floor setup
+
+At this point I have a pretty set stack for the projects I want to build fast,
+and it looks like this:
+
+- [NodeJS](https://nodejs.org/api/fs.html)
+- [Typescript](https://www.typescriptlang.org/docs)
+- [NestJS](https://docs.nestjs.com)
+  - This might look like a head scratcher, but I find that `express` is actually
+    _too_ loose, most of the time -- I always end up writing in some sort of
+    component system which manages lifecycle. NestJS is the best mix of
+    pragmatism and "enterprise" application creature comforts that I've seen so
+    far.
+
+Obviously, the real question here is what should I use to provide the dynamic
+OIDC part of my flow? At first I chose
+[`panva/node-oidc-provider`](https://github.com/panva/node-oidc-provider). The
+documentation is thorough but unfortunately the onboarding just _wasn't easy
+enough_ for me.
+
+### First try: NestJS w/ `panva/node-oidc-provider`
+
+Unfortunately `node-oidc-provider` had no ready-to-use Postgres DB adapter -
+there's a
+[rough edge example](https://github.com/panva/node-oidc-provider/blob/7d6b195424c539a8341e665aeabcaf50e7b5ab9a/example/adapters/contributed/sequelize.js),
+but the more I read the documentation, and the more I implemented the surface of
+the API you needed to slot in the more I was convinced that it was just... too
+hard.
+
+A couple things went distinctively wrong:
+
+- Integrating `node-oidc-provider` with NestJS was more difficult than I
+  expected (everything's just a `(req, res) => void` right? in the end it better
+  to use a `Controller` rather than a NestJS `Middleware`)
+- Replicating the schema (so I could enshrine it in the database) of
+  `node-oidc-provider` revealed a
+  semi-[attribute-value style](https://en.wikipedia.org/wiki/Attribute-value_system)
+  layout
+
+**This project actually sat on the shelf for _6 months_ during this time**, as I
+had more important fish to fry - thinking about it was a constant source of
+discontent. Funnily enough, I gave up just when I had figured everything out -
+and I had just written a glorious DB adapter that actually worked like I wanted
+it to:   
+
+<details>
+  <summary markdown="span">📜️ node-oidc-provider DB Adapter (click to expand)</summary>
+
+```typescript
+
+import { Logger } from "@nestjs/common";
+import { DBService } from "./services/db";
+import {
+  getTypeForOIDCProviderModelName,
+  getTypeValidatorForOIDCProviderModelName,
+  OIDCProviderModel,
+  OIDCProviderModelID,
+  OIDCGrantID,
+  getOIDCModelPrefix,
+  isExpirableEntity,
+  isConsumableEntity,
+  isConsumableOIDCProviderModel,
+} from "./types";
+
+import {
+  OIDCGrant,
+} from "./models";
+
+/**
+ * Arguments required to build an oidc-provider adapter that uses a DBService
+ * @see buildOIDCAdapter
+ */
+interface BuildDBOIDCAdapterArgs {
+  db: DBService;
+  logger?: Logger;
+}
+
+export type OIDCAdapterClassFunction =  (name: string) => void;
+
+/**
+ * Builder for OIDC Adapter that uses a DBService
+ *
+ * @see https://github.com/panva/node-oidc-provider/blob/main/example/my_adapter.js
+ * @param {BuildDBOIDCAdapterArgs} args
+ * @returns {Promise<Function>} A constructor function that builds oidc-provider compliant functions
+ */
+export async function buildOIDCAdapter(args: BuildDBOIDCAdapterArgs): Promise<OIDCAdapterClassFunction> {
+  const { db, logger } = args;
+
+  // Create anonymous class that performans as an Adapter usable by oidc-provider
+  return function DBOIDCAdapter(name) {
+    this.name = name;
+    this.db = db;
+
+    this.upsert = async (
+      partialID: OIDCProviderModelID,
+      payload: OIDCProviderModel,
+      expiresInSeconds?: number,
+    ) => {
+      const fullID = this.key(partialID);
+      const expiresAt = expiresInSeconds ? new Date(new Date().getTime() + (expiresInSeconds * 1000)) : null;
+
+      const modelClass = getTypeForOIDCProviderModelName(this.name);
+      const validator = getTypeValidatorForOIDCProviderModelName(this.name);
+
+      // Ensure the payload matches what we expect the model class to look like?
+      if (!validator(payload)) {
+        logger?.error(`Invalid payload for OIDC model class [${modelClass.name}]: ${JSON.stringify(payload, null, '  ')}`);
+        throw new Error(`Invalid payload for OIDC model class [${modelClass.name}]`);
+      }
+
+      // Grantable classes must have grant
+      await db.upsertEntityByID(modelClass, fullID, {...payload, expiresAt });
+    };
+
+    this.find = async (partialID: OIDCProviderModelID) => {
+      const cls = getTypeForOIDCProviderModelName(this.name);
+      const fullID = this.key(partialID);
+      const entity = await db.findEntity(cls, { id: fullID });
+      if (!entity) { return undefined; }
+
+      if (isExpirableEntity(entity)) {
+        if (new Date() <= entity.expiresAt) { return undefined; }
+      }
+
+      if (isConsumableEntity(entity)) {
+        if (new Date() < entity.consumedAt) { return undefined; }
+      }
+
+      return entity;
+    };
+
+    this.findByUserCode = async (userCode: string) => {
+      const cls = getTypeForOIDCProviderModelName(this.name);
+      const entity = await db.findEntity(cls, { userCode });
+      if (!entity) { return undefined; }
+      return entity;
+    };
+
+    this.findByUid = async (uid: string) => {
+      const cls = getTypeForOIDCProviderModelName(this.name);
+      const entity = await db.findEntity(cls, { uid });
+      if (!entity) { return undefined; }
+      return entity;
+    };
+
+    this.consume = async (partialID: OIDCProviderModelID) => {
+      const fullID = this.key(partialID);
+      const cls = getTypeForOIDCProviderModelName(this.name);
+
+      if (!isConsumableOIDCProviderModel(cls)) {
+        throw new TypeError(`class [${cls.name}] is not consumable`);
+      }
+
+      await db.consumeEntity(cls, fullID);
+    };
+
+    this.destroy = async (partialID: OIDCProviderModelID) => {
+      const fullID = this.key(partialID);
+      await db.deleteEntity(getTypeForOIDCProviderModelName(this.name), { id: fullID });
+    };
+
+    this.revokeByGrantId = async (partialGrantID: OIDCGrantID) => {
+      const id = `grant_${partialGrantID}`;
+      const grant = await db.findEntity<OIDCGrant>(OIDCGrant, {id});
+      if (!grant) { throw new Error(`No such OIDCGrant with ID [${id}]`); }
+
+      // Delete the grant and all related tokens
+      await db.deleteGrantAndRelatedEntities(id);
+    };
+
+    this.key = (id: string) => {
+      return `${getOIDCModelPrefix(this.name)}_${id}`;
+    };
+  };
+}
+
+```
+</details>
+
+
+The pain of having to figure out every single one of those enums & classes
+(`OIDCGrant`, `OIDCProviderModelID`), write the appropriate DB entities, and do
+the checks in a way that made sense to me, made me think: **"why am I even using
+this library if I have to get this much into the weeds?"**
+
+I'm just too lazy to do this much work (to be fair I already did it but we'll
+ignore that).
+
+Luckily for me I'd seen Ory and their extensive toolset before, and was able to
+recall one of their solutions that would help --
+[Ory Hydra](https://www.ory.sh/docs/hydra).
+
+### Second time's the charm: NestJS + Ory Hydra
+
+Ory's got a lot of tools with interesting names, and it's often hard to remember
+what they do, but [Hydra](https://www.ory.sh/docs/hydra) is the one in the
+toolbelt that makes OAuth2+OpenID Connect flows a breeze (and I can confirm they
+do!). They've got an excellent
+[documentation site](https://www.ory.sh/hydra/docs), the codebase is written in
+Golang (quite possibly the easiest to understand compiled language out there),
+and more importantly, **they promise to take the complexity _out_ of managing
+the OAuth2 flow**.
+
+I don't manage any fo the grants revocation, etc, Hydra does the work for me.
+
+#### Installing & running Ory Hydra
+
+Since Ory knows just how to appeal to developers, Hydra is a cinch to run
+locally with the
+[`oryd/hydra` Docker container](https://hub.docker.com/r/oryd/hydra):
+
+```makefile
+hydra-local:
+    @echo -e "Running local hydra...\n\n"
+    $(DOCKER) run --rm \
+        -it \
+        --network host \
+        -p 0.0.0.0:${HYDRA_PUBLIC_PORT}:${HYDRA_PUBLIC_PORT} \
+        -p 0.0.0.0:${HYDRA_ADMIN_PORT}:${HYDRA_ADMIN_PORT} \
+        --name ${HYDRA_CONTAINER_NAME} \
+        -e DSN="${HYDRA_DSN}" \
+        -e WEBFINGER_OIDC_DISCOVERY_SUPPORTED_CLAIMS=${HYDRA_WEBFINGER_OIDC_DISCOVERY_SUPPORTED_CLAIMS} \
+        -e URLS_LOGIN=${HYDRA_URLS_LOGIN} \
+        -e URLS_CONSENT=${HYDRA_URLS_CONSENT} \
+        -e URLS_LOGOUT=${HYDRA_URLS_LOGOUT} \
+        -e URLS_ERROR=${HYDRA_URLS_ERROR} \
+        -e URLS_POST_LOGOUT_REDIRECT=${HYDRA_URLS_POST_LOGOUT_REDIRECT} \
+        -e URLS_SELF_PUBLIC=${HYDRA_URLS_SELF_PUBLIC} \
+        -e URLS_SELF_ISSUER=${HYDRA_URLS_SELF_ISSUER} \
+        -e OAUTH2_ALLOWED_TOP_LEVEL_CLAIMS=${HYDRA_OAUTH2_ALLOWED_TOP_LEVEL_CLAIMS} \
+        -e OAUTH2_HASHERS_BCRYPT_COST=${HYDRA_OAUTH2_HASHERS_BCRYPT_COST} \
+        -e SECRETS_SYSTEM=${HYDRA_SECRETS_SYSTEM} \
+        -e TTL_ACCESS_TOKEN=${HYDRA_TTL_ACCESS_TOKEN} \
+        -e TTL_REFRESH_TOKEN=${HYDRA_TTL_REFRESH_TOKEN} \
+        -e TTL_ID_TOKEN=${HYDRA_TTL_ID_TOKEN} \
+        --entrypoint /bin/ash \
+        ${HYDRA_IMAGE}:${HYDRA_IMAGE_TAG} \
+        -c "\
+            /usr/bin/hydra migrate sql --yes '${HYDRA_DSN}';\
+            /usr/bin/hydra serve all \
+            --dangerous-force-http \
+            --dangerous-allow-insecure-redirect-urls 'https://localhost'\
+        "
+```
+
+OK so there's a LOT of environment variables there, but just ignore em for now
+(if you ever do this you can actually
+[look up what they do](https://www.ory.sh/hydra/docs/reference/configuration)).
+
+I've modified the `entrypoint` of the image because I want to do a few different
+things before I run `hydra`:
+
+- Run the SQL migrations
+  - As you might expect from any reasonably written DB-adjacent program,
+    migrations are idempotent
+- Serve _both_ the public and admin API (`serve all`)
+- Allow `hydra` to operate over unsecured HTTP on localhost
+- Allow `hydra` to use insecure redirect URLs like HTTPS localhost (I actually
+  don't need this but it's in the `Makefile` so I'll repeat it here)
+
+BTW: Just to ruffle some feathers out there - if you think containerization
+isn't a massively useful tool in 2022, you're wrong.
+
+If you're with me at this point, you now have a working OAuth2+OpenID connect
+compliant server - Done.
+
+#### Create yourself an OAuth2+OpenID Connect client app
+
+At this point we may have an OIDC compliant server, but we also need at least
+_one_ client to make authentication requests to it!
+
+You can do this quite easily by `docker exec`-ing into that container we started
+earlier:
+
+```makefile
+hydra-local-create-client:
+    $(DOCKER) exec -it \
+        $(HYDRA_CONTAINER_NAME) \
+        hydra clients create lwhn \
+            --endpoint="$(HYDRA_ADMIN_ENDPOINT_URL)" \
+            --callbacks="$(LWHN_HYDRA_CLIENT_REDIRECT_URI)" \
+            --id=$(LWHN_HYDRA_CLIENT_ID) \
+            --secret=$(LWHN_HYDRA_CLIENT_SECRET) \
+            --audience="$(LWHN_HYDRA_CLIENT_AUDIENCES)" \
+            --post-logout-callbacks="$(LWHN_HYDRA_CLIENT_POST_LOGOUT_REDIRECT_URI)" \
+            --grant-types=authorization_code \
+            --response-types=code \
+            --scope=$(LWHN_HYDRA_CLIENT_SCOPES)
+```
+
+Hydra's got excellent
+[documentation on the `hydra clients create` CLI](https://www.ory.sh/hydra/docs/cli/hydra-clients-create).
+
+#### Integrating Hydra into our app (and later other apps)
+
+So we've got an OAuth2 provider running, with a single OAuth client... but we
+haven't actually _written_ the app that we're going to use to manage or do
+anything!
+
+What were we trying to do again? It's a bit meta but try to stick with me -
+**LoginWithHN (LWHN) has three similar but slightly different integration points
+with Hydra:**
+
+- Login implementation that Hydra depends on ("hydra calls this thing to
+  actually do it's job")
+- Demo app uses Hydra as a customer ("LWHN calls Hydra to actually do logins")
+- Registration for _other client applications_ ("other peoples' apps use
+  LoginWithHN to perform OAuth2 login")
+
+Let's shelf this for now though, because we've hit on something we need to zoom
+out and solve - **how do we actually authenticate people from HN?**
+
+## Step three: Building the login mechanism
+
+Let's zoom back out and build the actual login mechanism - that shouldn't be
+too hard to hack right?
+
+Since HN has public profile pages that users can modify at any time, we can
+easily verify any user can access any account:
+
+1. Get the user's username
+2. Provide a unique code or phrase to put in their HN profile
+3. Confirm the profile contains the expected text
+4. Mark them as logged in
+
+As many on HN helpfully noted, I'm
+[not](https://news.ycombinator.com/item?id=29929060)
+[the](https://indieauth.com/)
+[first](http://zacstewart.com/2012/12/24/verifying-minecraft-user-accounts.html)
+to use this sort of method, it's been used to great effect in the past. The
+method really boils down to one important `setInterval`:
+
+<details>
+  <summary> 📜️ Important setInterval #1, checking the HN Profil (click to expand)</summary>
+
+```js
+
+
+   // Start watching for account
+    let times = 0;
+    const intervalID = setInterval(
+      async () => {
+        try {
+          // If we've exceeded max checks, then stop polling
+          if (times >= maxChecks) {
+            this.ongoingPolls.delete(hnUsername);
+            clearInterval(intervalID);
+            throw new Error(`Exceeded max checks [${maxChecks}] (delayMs: ${delayMs})`);
+          }
+          times++;
+
+          // Check user's YC profile
+          this.logger.debug(`looking for [${displayToken}] on HN profile [${hnUsername}]`);
+
+          // PREVIOUSLY:
+          //
+          // // FUTURE: if fallbacks get implemented, require that delay from ENV is no less than 30 seconds like before!
+          // const resp = await axios.get(
+          //   `https://news.ycombinator.com/user?id=${hnUsername}`,
+          //   {responseType: 'text'},
+          // );
+          //
+          // const profileDataContainsCode = resp.data.includes(buildLoginTokenPhrase(displayToken));
+
+          // Get user data using Firebase HN API
+          const resp = await axios.get(`https://hacker-news.firebaseio.com/v0/user/${hnUsername}.json`);
+
+          const about = resp?.data?.about;
+          if (!about) {
+            this.logger.error("About unexpectedly missing on response from Firebase API");
+            return;
+          }
+
+          // If the profile data contained the right info, then clear the interval and mark the account logged in
+          if (!about.includes(buildLoginTokenPhrase(displayToken))) { return; }
+
+          // At this point we have found the display token, the user has confirmed usage of the account
+          this.logger.debug(`found display token [${displayToken}] on HN profile [${hnUsername}]`);
+
+          // Confirm login success
+          await this.dbSvc.confirmLoginSuccessByHNUsername({
+            hnUsername,
+            hnMetadata: {
+              karma: resp?.data?.karma,
+              // created is expected to be unix epoch
+              createdAtISOString: new Date(resp?.data?.created * 1000).toISOString(),
+            },
+          });
+
+          // Stop checking since it's been found
+          this.ongoingPolls.delete(hnUsername);
+          clearInterval(intervalID);
+        } catch (err) {
+          this.logger.error(`Error occurred while checking for HN profile page update: ${err.toString()}`);
+        }
+      },
+      delayMs,
+    );
+    this.ongoingPolls.set(hnUsername, displayToken);
+
+```
+</details>
+
+And that's basically it! you can imagine what `this.dbSvc` (in fact the
+abstraction is a bit off there, that should be something like `loginSvc` (which
+also exists!) but I digress.
+
+## Hooking up to Hydra: Core functionality
+
+OK, now we've got the basic functionality (well a sketch of it!) -- let's hook
+it up to Hydra. Let's start by RTFMing:
+
+- [Hydra docs on login flow](https://www.ory.sh/hydra/docs/concepts/login)
+- [Hydra docs on consent flow](https://www.ory.sh/hydra/docs/concepts/consent)
+- [Hydra example login & consent app in NodeJS](https://github.com/ory/hydra-login-consent-node/blob/master/src/routes/logout.ts)
+
+Hydra's gone above and beyond in providing this documentation and example app,
+so it's smart to use/study them.
+
+**We need to create the source of truth for the Hydra OAuth2/OpenID Connect
+facade**.
+
+Out of this came a few NestJS controllers and endpoints that mediate the flow,
+here's one example:
+
+<details>
+  <summary>📜️ Login controller (click to expand)</summary>
+
+```typescript
+- POST /api/v1/login/start
+- Start the login process for a given user
+-
+- @param {LoginStartRequest} body
+- @returns {Promise<ResponseEnvelope<void>>} A promise that resolves when the
+  process has started \*/ @Post('/start') async startLogin( @Body(new
+  ValidationPipe()) body: LoginStartRequest, @Res() res: Response, ):
+  Promise<void> { const { hnUsername, loginChallenge } = body;
+  this.logger?.debug(`received start login request [${hnUsername}]`);
+
+
+    // Ory login challenge stuff
+    if (!loginChallenge) {
+      res.status(HttpStatus.BAD_REQUEST).send("Missing login challenge");
+      throw new BadRequestException("Missing login challenge");
+      return;
+    }
+
+    // Get login request from Ory Hydra
+    try {
+      const hydraAdmin = await this.hydraSvc.getAdminAPI();
+
+      // Retrieve login request from Hydra
+      const { data: loginRequest } = await hydraAdmin.getLoginRequest(loginChallenge);
+
+      // If skip is specified, we can automatically pass the user
+      if (loginRequest.skip) {
+        // Accept login request
+        const { data: acceptLoginResp } = await hydraAdmin.acceptLoginRequest(
+          loginChallenge,
+          { subject: String(loginRequest.subject) },
+        );
+
+        // Redirect to where Hydra says to
+        res.redirect(acceptLoginResp.redirect_to);
+        return;
+      }
+
+      // Save challenge ID for the account
+      await this.dbSvc.updateEntityByQuery(Account, { hnUsername }, { hydraCurrentSessionID: loginRequest.session_id });
+
+      this.logger.debug(`saved login request challenge with ID [${loginRequest.challenge}]`);
+
+    } catch (err) {
+      this.logger.error(`Failed to login start w/ hydra: ${err.toString()}`);
+
+      // throw new InternalServerErrorException("Failed to process login challenge");
+      res.redirect("/error");
+      return;
+    }
+
+    // ****** HERE is where we start checking for the user! ******
+
+    // Start login for user, returning a map of mechanisms that the user can use
+    const loginMechanism = await this.loginSvc.startLoginForAccountByHNUsername({ hnUsername, loginChallenge });
+
+    const response = {
+      status: ResponseStatus.Success,
+      data: {
+        hnUsername,
+        loginMechanism,
+      }
+    };
+
+    // Send response back
+    res.json(response);
+```
+
+</details>
+
+
+
+That's what it looks like to _start_ the login flow. What I haven't included
+here is the bit where I generate a `login_challenge` from Hydra but it's not
+hard to do (you'll get one by just setting up Hydra correctly).
+
+It's not quite clear from just that code but the `loginMechanism` that comes
+back is an object like this:
+
+```typescript
+export enum LoginMechanismName {
+  PollHN = 'poll-hn',
+  TOTP = 'totp',
+  Email = 'email'
+}
+
+export type HNUsername = string
+export type PollHNLoginMechanism = {
+  kind: LoginMechanismName.PollHN
+  hnUsername: HNUsername
+  displayToken: string
+}
+
+export type TOTPCode = number
+export type TOTPLoginMechanism = {
+  kind: LoginMechanismName.TOTP
+  hnUsername: HNUsername
+}
+
+export type EmailAddress = string
+export type EmailLoginMechanism = {
+  kind: LoginMechanismName.Email
+  hnUsername: HNUsername
+}
+
+export type LoginMechanism =
+  | PollHNLoginMechanism
+  | TOTPLoginMechanism
+  | EmailLoginMechanism
+```
+
+Implementing the Hydra login and consent flows was easy, I'll avoid duplicating
+their documentation with this post. Similarly, including HN-specific data like
+karma count as OIDC claims was very easy during the Hydra integration.
+
+LoginWithHN is obviously geared towards HN, but there are lots of other places
+people might want to login using a similar flow. Who knows when I'll get to it,
+but expansion is an interesting prospect.
+
+## Hooking up to Hydra: LoginWithHN as the first (meta) client app
+
+So now we've got the source of truth for Hydra in place, and we've got a
+theoretically functional flow, let's build the app that exposes that flow for a
+demo to anyone who visits! It's not hard to build, but paradoxically the more
+interesting part is that there's another important `setInterval` - instead of
+just `POST`ing username/password details to our app and being whisked away to
+the OAuth2 server, we need to actually _wait_ for a message to come back. I've
+kept it simple with some polling:
+
+
+<details>
+<summary>📜️ The second important setInterval (click to expand)</summary>
+
+```javascript
+  // Start polling to check for resolution of login
+  let intervalID = setInterval(
+    () => {
+      // Check whether the account has been confirmed using the display token
+      fetch(
+        "/api/v1/hn/poll/status",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          credentials: "same-origin",
+          body: JSON.stringify({ displayToken }),
+        },
+      )
+        .then(loginStartResp => processFetchJSONResponse({ response: loginStartResp }))
+        .then(envelope => processLoginResultData(envelope))
+        .then(loggedIn => {
+          if (!loggedIn) { return; }
+          // If login succeeded, then we can stop polling
+          // Next steps should have been triggered in processLoginResultData() and will be triggering soon
+          if (indicatorElem) { indicatorElem.classList.add("hidden"); }
+
+          clearInterval(intervalID);
+        })
+        .catch(err => {
+          showPageFlash({
+            variant: "error",
+            title: "Error while checking login",
+            description: `An error occurred while checking your profile... Please try <a href="/">logging in again</a>.`,
+          });
+
+          if (indicatorElem) { indicatorElem.classList.remove("hidden"); }
+
+          clearInterval(intervalID);
+        });
+    },
+    CHECK_HN_POLL_RESULT_INTERVAL_MS,
+  );
+
+// You'll need this as well for context!
+
+/**
+ * Process the data fterp a login result, as
+ * all login methods produce the same LoginResultData object
+ *
+ * @returns {boolean} whether the login completed or not
+ */
+function processLoginResultData(envelope) {
+  // Ensure data is present
+  if (!envelope.data) {
+    const err = new Error("Data missing from envelope");
+    err.responseData = envelope;
+    throw err;
+  }
+
+  // Ensure request succeeded
+  if (envelope.status !== "success") {
+    genericErrorFlash();
+    console.error(err);
+    const err = new Error("Login failed");
+    err.responseData = envelope;
+    throw err;
+  }
+
+  // Get the redirect URL
+  const { confirmed, redirectURL } = envelope.data;
+
+  // Return immediately if the user is still not confirmed
+  if (!confirmed) { return false; }
+
+  if (!redirectURL) {
+    console.error(err);
+    const err = new Error("redirectURL unexpectedly missing from response");
+    err.responseData = envelope;
+    throw err;
+  }
+
+  // Show flash signalling successful login
+  showPageFlash({
+      variant: "success",
+      title: "Login successful",
+      description: "You've been logged in! Redirecting...",
+    flashDurationMs: DEFAULT_FLASH_DURATION_MS,
+  });
+
+  // If the response succeeded, then the login cookie has been set,
+  // we can go to the page to finish out the login
+  setTimeout(() => window.location = redirectURL, LOGIN_SUCCESS_REDIRECT_WAIT_MS);
+
+  return true;
+}
+
+```
+</details>
+
+
+This time I'm checking in with the core functionality API to check whether the
+`setInterval` from earlier has resolved itself.
+
+If the user _has_ logged in properly we show a little message and use
+`window.location` redirect to the URL that you'd be redirectedto normally by
+`POST`ing your username/password.
+
+And that's all it really takes! Of course I'm missing
+[the rest of the owl](https://knowyourmeme.com/memes/how-to-draw-an-owl), but
+just believe me here -- it's not that hard (you could do it yourself, probably
+in a day).
+
+## Hooking up to Hydra: Setting up LWHN to onboard other client apps
+
+To make this tool actually useful to _anyone else_, we're going to have to
+enable other client apps to do login with HN _as well_. This is basically as
+simple as interacting with the
+[private Hydra administrative API](https://www.ory.sh/hydra/docs/reference/api/#tag/admin)
+and creating clients when people sign up. Rather than dropping more code, I'll
+show the app I built to make it happen which was quite fun to build:
+
+![top of the LWHN app](/media/lwhn-top-picture.png)
+
+And below there, an example integration and some instructions for various ways
+to integrate
+
+![integration instructions below the fold of the LWHN app](/media/lwhn-integration-picture.png)
+
+# Easy addon #1: Getting the user's karma
+
+One repeatedly requested feature was the ability to limit users based on HN
+karma.
+
+Since it's pretty fraught for _me_ to determine where the limit should be, I
+just expose it.
+
+It was quite easy to do, since
+[the official HN API](https://github.com/HackerNews/API) produces user `karma`
+information:
+
+```typescript
+          // Confirm login success
+          await this.dbSvc.confirmLoginSuccessByHNUsername({
+            hnUsername,
+            hnMetadata: {
+              karma: resp?.data?.karma,
+              // created is expected to be unix epoch
+              createdAtISOString: new Date(resp?.data?.created * 1000).toISOString(),
+            },
+          });
+```
+
+You've seen this code before (it's in the larger code listing above) but worth
+noting -- I just save it in the DB next to everything else when I confirm a
+successful login.
+
+## Next: Getting whether a HN user is a YC founder or not
+
+Though they're related, [HackerNews](https://news.ycombinator.com) is not
+[Y Combinator](https://ycombinator.com). Not every HN user is a YC founder, and
+one thing people have asked for a lot is **being able to prove whether an HN
+user is indeed a YC founder**. YC founders want to make things for YC founders
+(who they can get lightning-fast feedback from, etc), and maybe even some people
+who aren't YC founders want to make things for YC founders.
+
+Thanks to the help of [OrangeDAO](https://badge.orangedao.xyz/) (which was
+recently
+[covered by TechCrunch](https://techcrunch.com/2022/01/24/hundreds-of-y-combinator-alumni-join-crypto-collective-to-back-web3-startups/)),
+it's actually quite easy to build in the functionality.
+
+Stay tuned for when that drops (or don't -- just go register now for an
+application and I'll email you!).
+
+## Wrapup
+
+There's more to do, but that's it for today! For those following along at home,
+if you were writing code you'd have already succesfully built the functionality
+that makes LoginWithHN tick.
+
+Thanks for coming along on this ride -- This project took a lot longer than it
+had to, but I'm glad to finally have it out there, and look forward to using it
+in my own projects. Building things for the HN community is always a joy, an
+hopefully now other people will have an option for getting auth hooked up that
+is extremely quick and easy to use.

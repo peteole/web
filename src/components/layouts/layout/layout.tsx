@@ -1,4 +1,5 @@
 import cn from 'classnames'
+import 'prismjs'
 import 'prismjs/components/prism-bash'
 import 'prismjs/components/prism-go'
 import 'prismjs/components/prism-javascript'
@@ -11,8 +12,7 @@ import 'prismjs/components/prism-yaml'
 import React, { useEffect } from 'react'
 import Helmet from 'react-helmet'
 
-import * as footer from '../../../page-content/navigation/navigation-footer'
-import * as nav from '../../../page-content/navigation/navigation-header'
+import { sideNav } from '../../../page-content/navigation/navigation-header'
 import Footer from '../footer/footer'
 import Navigation from '../navigation/navigation'
 import EventLayout from '../summit/event-layout'
@@ -21,6 +21,8 @@ import * as styles from './layout.module.css'
 
 import oryLogoPrimary from '../../../images/logo/logo-ory-primary.svg'
 import oryLogoWhite from '../../../images/logo/logo-ory-white.svg'
+import footer from '../../../page-content/navigation/footer.json'
+import nav from '../../../page-content/navigation/header.json'
 
 interface PropTypes {
   isEvent?: boolean
@@ -31,12 +33,7 @@ interface PropTypes {
 const Layout = ({ children, theme, isEvent }: PropTypes) => {
   return (
     <div className={cn(styles.layout)}>
-      <Navigation
-        logo={oryLogoPrimary}
-        {...nav.sideNav}
-        {...nav.dropdownMenu}
-        {...nav.mobileMenu}
-      />
+      <Navigation logo={oryLogoPrimary} {...sideNav} {...nav} />
       <main
         className={cn(
           theme ? `theme-${theme}` : '',
@@ -45,13 +42,7 @@ const Layout = ({ children, theme, isEvent }: PropTypes) => {
       >
         {isEvent ? <EventLayout>{children}</EventLayout> : children}
       </main>
-      <Footer
-        logo={oryLogoWhite}
-        {...footer.copyright}
-        {...footer.social}
-        {...footer.legal}
-        {...footer.links}
-      />
+      <Footer logo={oryLogoWhite} {...footer} />
     </div>
   )
 }

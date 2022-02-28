@@ -2,13 +2,13 @@ const copydir = require('copy-dir')
 const fs = require('fs')
 
 ;[
-  './public/css',
-  './public/docs',
-  './public/en',
-  './public/images',
-  './public/img',
-  './public/js',
-  './public/versions',
+  // './public/css',
+  // './public/docs',
+  // './public/en',
+  // './public/images',
+  // './public/img',
+  // './public/js',
+  // './public/versions',
 
 ].forEach(function(d) {
   try {
@@ -19,10 +19,10 @@ const fs = require('fs')
 })
 
 ;[
-  'keto',
-  'kratos',
-  'oathkeeper',
-  'hydra',
+  // 'keto',
+  // 'kratos',
+  // 'oathkeeper',
+  // 'hydra',
 ].forEach((project) => {
   const dst = `./public/${project}/docs`
   try {
@@ -50,4 +50,4 @@ const fs = require('fs')
 //  fse.copySync('./generated/v1/docs/versions.html', './public/docs/versions.html')
 
 // ecosystem needs to be copied after v1 docs!
-copydir.sync('./generated/docs/docs', './public/docs')
+// copydir.sync('./generated/docs/docs', './public/docs')

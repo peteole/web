@@ -14,6 +14,10 @@ const detectLanguage = (src: string) => {
   switch (ext) {
     case 'jsx':
       return 'jsx'
+    case 'py':
+      return 'yml' // FIXME: Prism.js does not support python syntax highlighting yet. This is workaround to add syntax highlighting for Python
+    case 'dart':
+      return 'yml' // FIXME: Prism.js does not support python syntax highlighting yet. This is workaround to add syntax highlighting for Python
     case 'tsx':
       return 'tsx'
     case 'ts':

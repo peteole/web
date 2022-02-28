@@ -104,34 +104,26 @@ https://www.ory.sh/docs/ecosystem/usage https://www.ory.sh/docs/ecosystem/api-de
 # April 2020 split docs repository change
 
 # https://www.ory.sh/keto/docs/engines/ https://www.ory.sh/keto/docs/engines 302!
-https://www.ory.sh/docs/keto/sdk/api https://www.ory.sh/keto/docs/reference/api 302!
-https://www.ory.sh/keto/docs/sdk/api https://www.ory.sh/keto/docs/reference/api 302!
-https://www.ory.sh/docs/keto/configuration https://www.ory.sh/keto/docs/reference/configuration 302!
-https://www.ory.sh/docs/keto/* https://www.ory.sh/keto/docs/:splat 302!
-https://www.ory.sh/docs/next/keto/* https://www.ory.sh/keto/docs/:splat 302!
+https://www.ory.sh/docs/keto/sdk/api https://www.ory.sh/docs/keto/reference/api 302!
+https://www.ory.sh/keto/docs/sdk/api https://www.ory.sh/docs/keto/reference/api 302!
+https://www.ory.sh/docs/keto/configuration https://www.ory.sh/docs/keto/reference/configuration 302!
 
 # https://www.ory.sh/kratos/docs/concepts/ https://www.ory.sh/kratos/docs/concepts 302!
 # https://www.ory.sh/kratos/docs/self-service/strategies/ https://www.ory.sh/kratos/docs/self-service/strategies 302!
 # https://www.ory.sh/kratos/docs/self-service/flows/ https://www.ory.sh/kratos/docs/self-service/flows 302!
-https://www.ory.sh/docs/kratos/sdk/api https://www.ory.sh/kratos/docs/reference/api 302!
-https://www.ory.sh/kratos/docs/sdk/api https://www.ory.sh/kratos/docs/reference/api 302!
-https://www.ory.sh/docs/kratos/* https://www.ory.sh/kratos/docs/:splat 302!
-https://www.ory.sh/docs/next/kratos/* https://www.ory.sh/kratos/docs/:splat 302!
+https://www.ory.sh/docs/kratos/sdk/api https://www.ory.sh/docs/kratos/reference/api 302!
+https://www.ory.sh/kratos/docs/sdk/api https://www.ory.sh/docs/kratos/reference/api 302!
 
 # https://www.ory.sh/oathkeeper/docs/pipeline/ https://www.ory.sh/oathkeeper/docs/pipeline 302!
-https://www.ory.sh/docs/oathkeeper/sdk/api https://www.ory.sh/oathkeeper/docs/reference/api 302!
-https://www.ory.sh/oathkeeper/docs/sdk/api https://www.ory.sh/oathkeeper/docs/reference/api 302!
-https://www.ory.sh/docs/oathkeeper/configuration https://www.ory.sh/oathkeeper/docs/reference/configuration 302!
-https://www.ory.sh/docs/oathkeeper/* https://www.ory.sh/oathkeeper/docs/:splat 302!
-https://www.ory.sh/docs/next/oathkeeper/* https://www.ory.sh/oathkeeper/docs/:splat 302!
+https://www.ory.sh/docs/oathkeeper/sdk/api https://www.ory.sh/docs/oathkeeper/reference/api 302!
+https://www.ory.sh/oathkeeper/docs/sdk/api https://www.ory.sh/docs/oathkeeper/reference/api 302!
+https://www.ory.sh/docs/oathkeeper/configuration https://www.ory.sh/docs/oathkeeper/reference/configuration 302!
 
-https://www.ory.sh/docs/performance/hydra https://www.ory.sh/hydra/docs/benchmark 302!
+https://www.ory.sh/docs/performance/hydra https://www.ory.sh/docs/hydra/benchmark 302!
 https://www.ory.sh/docs/performance/ https://www.ory.sh/hydra/docs/benchmark 302!
-https://www.ory.sh/docs/hydra/sdk/api https://www.ory.sh/hydra/docs/reference/api 302!
-https://www.ory.sh/hydra/docs/sdk/api https://www.ory.sh/hydra/docs/reference/api 302!
-https://www.ory.sh/docs/hydra/configuration https://www.ory.sh/hydra/docs/reference/configuration 302!
-https://www.ory.sh/docs/hydra/* https://www.ory.sh/hydra/docs/:splat 302!
-https://www.ory.sh/docs/next/hydra/* https://www.ory.sh/hydra/docs/:splat 302!
+https://www.ory.sh/docs/hydra/sdk/api https://www.ory.sh/docs/hydra/reference/api 302!
+https://www.ory.sh/hydra/docs/sdk/api https://www.ory.sh/docs/hydra/reference/api 302!
+https://www.ory.sh/docs/hydra/configuration https://www.ory.sh/docs/hydra/reference/configuration 302!
 
 https://www.ory.sh/docs/ecosystem https://www.ory.sh/docs/ecosystem/projects
 
@@ -142,23 +134,23 @@ https://www.ory.sh/docs/next https://www.ory.sh/docs/index 302!
 
 # May 2020 Kratos docs refactoring
 
-https://www.ory.sh/kratos/docs/self-service/flows/user-settings-profile-management https://www.ory.sh/kratos/docs/self-service/flows/user-settings 302!
+https://www.ory.sh/kratos/docs/self-service/flows/user-settings-profile-management https://www.ory.sh/docs/kratos/self-service/flows/user-settings 302!
 
-https://www.ory.sh/kratos/docs/self-service/strategies/username-email-password https://www.ory.sh/kratos/docs/self-service/flows/user-login-user-registration/username-email-password 302!
+https://www.ory.sh/kratos/docs/self-service/strategies/username-email-password https://www.ory.sh/docs/kratos/self-service/flows/user-login-user-registration/username-email-password 302!
 https://www.ory.sh/kratos/docs/self-service/strategies/openid-connect-social-sign-in-oauth2 https://www.ory.sh/kratos/docs/self-service/flows/user-login-user-registration/openid-connect-social-sign-in-oauth2 302!
 
-https://www.ory.sh/kratos/docs/self-service/strategies/user-settings-profile https://www.ory.sh/kratos/docs/self-service/flows/user-settings/user-profile-management 302!
-https://www.ory.sh/kratos/docs/self-service/flows/index https://www.ory.sh/kratos/docs/self-service 302!
-https://www.ory.sh/kratos/docs/self-service/index https://www.ory.sh/kratos/docs/self-service 302!
+https://www.ory.sh/kratos/docs/self-service/strategies/user-settings-profile https://www.ory.sh/docs/kratos/self-service/flows/user-settings/user-profile-management 302!
+https://www.ory.sh/kratos/docs/self-service/flows/index https://www.ory.sh/docs/kratos/self-service 302!
+https://www.ory.sh/kratos/docs/self-service/index https://www.ory.sh/docs/kratos/self-service 302!
 
-https://www.ory.sh/kratos/docs/next/self-service/flows/user-settings-profile-management https://www.ory.sh/kratos/docs/next/self-service/flows/user-settings 302!
+https://www.ory.sh/kratos/docs/next/self-service/flows/user-settings-profile-management https://www.ory.sh/docs/kratos/next/self-service/flows/user-settings 302!
 
-https://www.ory.sh/kratos/docs/next/self-service/strategies/username-email-password https://www.ory.sh/kratos/docs/next/self-service/flows/user-login-user-registration/username-email-password 302!
+https://www.ory.sh/kratos/docs/next/self-service/strategies/username-email-password https://www.ory.sh/docs/kratos/next/self-service/flows/user-login-user-registration/username-email-password 302!
 https://www.ory.sh/kratos/docs/next/self-service/strategies/openid-connect-social-sign-in-oauth2 https://www.ory.sh/kratos/docs/next/self-service/flows/user-login-user-registration/openid-connect-social-sign-in-oauth2 302!
 
-https://www.ory.sh/kratos/docs/next/self-service/strategies/user-settings-profile https://www.ory.sh/kratos/docs/next/self-service/flows/user-settings/user-profile-management 302!
-https://www.ory.sh/kratos/docs/next/self-service/flows/index https://www.ory.sh/kratos/docs/next/self-service 302!
-https://www.ory.sh/kratos/docs/next/self-service/index https://www.ory.sh/kratos/docs/next/self-service 302!
+https://www.ory.sh/kratos/docs/next/self-service/strategies/user-settings-profile https://www.ory.sh/docs/kratos/next/self-service/flows/user-settings/user-profile-management 302!
+https://www.ory.sh/kratos/docs/next/self-service/flows/index https://www.ory.sh/docs/kratos/next/self-service 302!
+https://www.ory.sh/kratos/docs/next/self-service/index https://www.ory.sh/docs/kratos/next/self-service 302!
 
 # END: 2020 Kratos docs refactoring
 
@@ -166,42 +158,42 @@ https://www.ory.sh/contact https://docs.google.com/forms/d/e/1FAIpQLSc5sViXt5rR4
 
 # 2020-07 Kratos docs refactoring
 
-https://www.ory.sh/kratos/docs/concepts/selfservice-flow-completion https://www.ory.sh/kratos/docs/concepts/browser-redirect-flow-completion 302!
-https://www.ory.sh/kratos/docs/fallback/verify https://www.ory.sh/kratos/docs/fallback/verification 302!
+https://www.ory.sh/kratos/docs/concepts/selfservice-flow-completion https://www.ory.sh/docs/kratos/concepts/browser-redirect-flow-completion 302!
+https://www.ory.sh/kratos/docs/fallback/verify https://www.ory.sh/docs/kratos/fallback/verification 302!
 
 # 2020-07 Hydra docs refactoring
 
-https://www.ory.sh/hydra/docs/integration https://www.ory.sh/hydra/docs/guides/using-oauth2 302!
-https://www.ory.sh/hydra/docs/implement-consent https://www.ory.sh/hydra/docs/guides/login 302!
-https://www.ory.sh/hydra/docs/implementing-consent https://www.ory.sh/hydra/docs/guides/login 302!
+https://www.ory.sh/hydra/docs/integration https://www.ory.sh/docs/hydra/guides/using-oauth2 302!
+https://www.ory.sh/hydra/docs/implement-consent https://www.ory.sh/docs/hydra/guides/login 302!
+https://www.ory.sh/hydra/docs/implementing-consent https://www.ory.sh/docs/hydra/guides/login 302!
 https://www.ory.sh/hydra/docs/oauth2 https://www.ory.sh/hydra/docs/concepts/oauth2 302!
-https://www.ory.sh/hydra/docs/debugging https://www.ory.sh/hydra/docs/debug 302!
+https://www.ory.sh/hydra/docs/debugging https://www.ory.sh/docs/hydra/debug 302!
 
 # 2020-09 Kratos docs refactoring
-https://www.ory.sh/kratos/docs/self-service/flows/user-login-user-registration/username-email-password https://www.ory.sh/kratos/docs/self-service/flows/user-registration 302!
+https://www.ory.sh/kratos/docs/self-service/flows/user-login-user-registration/username-email-password https://www.ory.sh/docs/kratos/self-service/flows/user-registration 302!
 https://www.ory.sh/kratos/docs/self-service/flows/user-login-user-registration/openid-connect-social-sign-in-oauth2 https://www.ory.sh/kratos/docs/self-service/flows/user-registration 302!
-https://www.ory.sh/kratos/docs/self-service/flows/user-login-user-registration https://www.ory.sh/kratos/docs/self-service/flows/user-registration 302!
-https://www.ory.sh/kratos/docs/self-service/flows/user-settings/user-profile-management https://www.ory.sh/kratos/docs/self-service/flows/user-settings 302!
-https://www.ory.sh/kratos/docs/self-service/flows/user-settings/change-password https://www.ory.sh/kratos/docs/self-service/flows/user-settings 302!
+https://www.ory.sh/kratos/docs/self-service/flows/user-login-user-registration https://www.ory.sh/docs/kratos/self-service/flows/user-registration 302!
+https://www.ory.sh/kratos/docs/self-service/flows/user-settings/user-profile-management https://www.ory.sh/docs/kratos/self-service/flows/user-settings 302!
+https://www.ory.sh/kratos/docs/self-service/flows/user-settings/change-password https://www.ory.sh/docs/kratos/self-service/flows/user-settings 302!
 https://www.ory.sh/kratos/docs/self-service/flows/user-settings/link-unlink-openid-connect-oauth2 https://www.ory.sh/kratos/docs/self-service/flows/user-settings 302!
-https://www.ory.sh/kratos/docs/self-service/flows/account-recovery/password-reset-recovery-link https://www.ory.sh/kratos/docs/self-service/flows/account-recovery 302!
+https://www.ory.sh/kratos/docs/self-service/flows/account-recovery/password-reset-recovery-link https://www.ory.sh/docs/kratos/self-service/flows/account-recovery 302!
 
 # 2020-09 Broken Link Audit 
 https://www.ory.sh/api-security-cloud-guide-overview.html https://www.ory.sh/web-api-cloud-access-control-authentication/ 302!
 https://editor.ory.sh/ https://react-page.github.io/ 302!
 https://www.ory.sh/api-security-cloud-guide-overview https://www.ory.sh/web-api-cloud-access-control-authentication/ 302!
 https://www.ory.sh/sites https://react-page.github.io/ 302!
-https://www.ory.sh/docs/1-hydra/4-security/0-readme https://www.ory.sh/hydra/docs/security-architecture 302!
-https://www.ory.sh/docs/1-hydra/7-sdk/0-readme https://www.ory.sh/hydra/docs/sdk/ 302!
-https://www.ory.sh/docs/1-hydra/0-tutorial/0-readme https://www.ory.sh/hydra/docs/5min-tutorial/ 302!
-https://www.ory.sh/docs/keto/sdk/keto-sdk-api https://www.ory.sh/keto/docs/sdk/index 302!
-https://www.ory.sh/docs/api/oathkeeper https://www.ory.sh/oathkeeper/docs/reference/api 302!
+https://www.ory.sh/docs/1-hydra/4-security/0-readme https://www.ory.sh/docs/hydra/security-architecture 302!
+https://www.ory.sh/docs/1-hydra/7-sdk/0-readme https://www.ory.sh/docs/hydra/sdk/ 302!
+https://www.ory.sh/docs/1-hydra/0-tutorial/0-readme https://www.ory.sh/docs/hydra/5min-tutorial/ 302!
+https://www.ory.sh/docs/keto/sdk/keto-sdk-api https://www.ory.sh/docs/keto/sdk/index 302!
+https://www.ory.sh/docs/api/oathkeeper https://www.ory.sh/docs/oathkeeper/reference/api 302!
 https://www.ory.sh/docs/1-hydra/ https://www.ory.sh/hydra/docs/ 302!
 https://www.ory.sh/docs/ecosystem/ecosystem-versioning https://www.ory.sh/docs/ecosystem/versioning/ 302!
-https://www.ory.sh/docs/api/oathkeeper?version=master https://www.ory.sh/oathkeeper/docs/reference/api 302!
-https://www.ory.sh/hydra/docs/images/docs/hydra/insecure-connection.png https://www.ory.sh/hydra/docs/assets/images/insecure-connection-26d35641951f189ef23d1606d59ce6a8.png 302!
-https://www.ory.sh/hydra/docs/images/docs/hydra/install-result.png https://www.ory.sh/hydra/docs/assets/images/install-result-193cacbd418864a96682f6811bbb6355.png 302!
-https://www.ory.sh/hydra/docs/images/docs/hydra/sample_trace.png https://www.ory.sh/hydra/docs/assets/images/sample_trace-0cd5d1302770f8483eef6909b17609e1.png 302!
+https://www.ory.sh/docs/api/oathkeeper?version=master https://www.ory.sh/docs/oathkeeper/reference/api 302!
+https://www.ory.sh/hydra/docs/images/docs/hydra/insecure-connection.png https://www.ory.sh/docs/hydra/assets/images/insecure-connection-26d35641951f189ef23d1606d59ce6a8.png 302!
+https://www.ory.sh/hydra/docs/images/docs/hydra/install-result.png https://www.ory.sh/docs/hydra/assets/images/install-result-193cacbd418864a96682f6811bbb6355.png 302!
+https://www.ory.sh/hydra/docs/images/docs/hydra/sample_trace.png https://www.ory.sh/docs/hydra/assets/images/sample_trace-0cd5d1302770f8483eef6909b17609e1.png 302!
 
 # Blog post madness
 https://www.ory.sh/mobile-login-auth-user-management-react-native-desktop-app-expo/ https://www.ory.sh/login-user-management-mobile-apps-react-native-expo-template/ 302!
@@ -248,13 +240,12 @@ https://www.ory.sh/blog/why-new-user-login-registration/ https://www.ory.sh/why-
 
 # Ory Docs Change: https://github.com/ory/docs/pull/446
 
-https://www.ory.sh/docs/guides/ory-cli-install-use/ https://www.ory.sh/docs/start-building/ory-cli-install-use/ 302!
 https://www.ory.sh/docs/guides/integrate-nodejs/ https://www.ory.sh/docs/start-building/server-side-web-app/ 302!
 
 # 2021-08 Docs Changes https://github.com/ory/kratos/pull/1639
 
 https://www.ory.sh/kratos/docs/next/concepts/identity-data-model/ https://www.ory.sh/kratos/docs/next/concepts/identity-schema/ 302!
-https://www.ory.sh/kratos/docs/concepts/identity-data-model https://www.ory.sh/kratos/docs/concepts/identity-schema 302!
+https://www.ory.sh/kratos/docs/concepts/identity-data-model https://www.ory.sh/docs/kratos/concepts/identity-schema 302!
 
 # Ory Summit 2021
 https://www.ory.sh/summit21 https://www.ory.sh/summit/2021 302!
@@ -266,3 +257,28 @@ https://www.ory.sh/install.sh https://raw.githubusercontent.com/ory/meta/master/
 # Nov 2021 Ory Cloud Docs Reorder
 
 https://www.ory.sh/docs/early-access/ https://www.ory.sh/docs/cloud/cloud-roadmap 302!
+
+# Ory Software Redirects
+# These redirects are URL shorthands returned by Ory Cloud APIs. They are used
+# by users to look up more information about the issue.
+https://www.ory.sh/dr/1 https://www.ory.sh/docs/debug/smtp-courier-1 302!
+https://www.ory.sh/dr/2 https://www.ory.sh/docs/kratos/concepts/credentials/username-email-password#hashed-password-format 302!
+
+# Ory Blog Categories Redirects
+
+https://www.ory.sh/blog/tag/authentication-as-a-service https://www.ory.sh/blog/tag/authentication 302!
+
+https://www.ory.sh/blog/tag/self-service https://www.ory.sh/blog/tag/authentication 302!
+
+https://www.ory.sh/blog/tag/product https://www.ory.sh/blog/tag/ory-cloud 302!
+
+https://www.ory.sh/blog/tag/qualitity-assurance https://www.ory.sh/blog/tag/quality-assurance 302!
+
+# Proxy to new docs
+/docs/ /docs/welcome 302!
+/docs/* https://docs-omega-six.vercel.app/docs/:splat 200!
+
+/keto/docs/* https://www.ory.sh/docs/keto/:splat 302!
+/kratos/docs/* https://www.ory.sh/docs/kratos/:splat 302!
+/oathkeeper/docs/* https://www.ory.sh/docs/oathkeeper/:splat 302!
+/hydra/docs/* https://www.ory.sh/docs/hydra/:splat 302!

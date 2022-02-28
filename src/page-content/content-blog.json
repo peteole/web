@@ -1,0 +1,143 @@
+{
+  "id": "blog.list",
+  "title": "Developer Blog & Articles",
+  "newsletter": {
+    "background": "",
+    "slant": false,
+    "smallpadding": true,
+    "preselect": "",
+    "title": "Never miss a patch",
+    "teaser": "Ory ships regular product patches and updates. Subscribe to our newsletter to get the good stuff, and stay up to date.",
+    "placeholder": "Enter your email",
+    "submit": "Subscribe"
+  },
+  "tags": [
+    {
+      "name": "Access Control"
+    },
+    {
+      "name": "API Security"
+    },
+    {
+      "name": "Architecture"
+    },
+    {
+      "name": "Authentication"
+    },
+    {
+      "name": "Best Practices"
+    },
+    {
+      "name": "Build vs Buy"
+    },
+    {
+      "name": "Case Study"
+    },
+    {
+      "name": "Company Updates"
+    },
+    {
+      "name": "Federation"
+    },
+    {
+      "name": "Guest Author"
+    },
+    {
+      "name": "Guide"
+    },
+    {
+      "name": "Identity"
+    },
+    {
+      "name": "Open Source"
+    },
+    {
+      "name": "Ory Cloud"
+    },
+    {
+      "name": "Passwordless"
+    },
+    {
+      "name": "Security & Compliance"
+    },
+    {
+      "name": "Serverless"
+    },
+    {
+      "name": "Testing"
+    },
+    {
+      "name": "User Management"
+    },
+    {
+      "name": "Zero Trust"
+    }
+  ],
+  "featured": {
+    "title": "Featured blog posts",
+    "big": "/login-flutter-authentication-example-api-open-source/",
+    "top": "/cloud-ecommerce-frontend/",
+    "bottom": "/looking-at-keto/"
+  },
+  "seo": {
+    "title": "Ory Developer Blog and Articles",
+    "description": "Read articles and blog posts from Ory core contributors and maintainers."
+  },
+  "authors": [
+    {
+      "name": "aeneasr",
+      "fullname": "Aeneas Rekkas",
+      "url": "http://github.com/aeneasr"
+    },
+    {
+      "name": "oryteam",
+      "fullname": "The Ory Team",
+      "url": "http://github.com/ory"
+    },
+    {
+      "name": "zepatrik",
+      "fullname": "Patrik Neu",
+      "url": "https://github.com/zepatrik"
+    },
+    {
+      "name": "vinckr",
+      "fullname": "Vincent Kraus",
+      "url": "https://github.com/vinckr"
+    },
+    {
+      "name": "radekg",
+      "fullname": "Radek Gruchalski",
+      "url": "https://github.com/radekg"
+    },
+    {
+      "name": "k9ert",
+      "fullname": "Kim Neunert",
+      "url": "https://github.com/k9ert"
+    },
+    {
+      "name": "bennihz",
+      "fullname": "Benjamin Hadizamani",
+      "url": "https://github.com/bennihz"
+    },
+    {
+      "name": "sashatalalasha",
+      "fullname": "Alexandra Talalaieva",
+      "url": "https://github.com/sashatalalasha"
+    },
+    {
+      "name": "gen1us2k",
+      "fullname": "Andrew Minkin",
+      "url": "https://github.com/gen1us2k"
+    },
+    {
+      "name": "iglu",
+      "fullname": "IGLU",
+      "url": "https://github.com/IGLU-Agency"
+    },
+    {
+      "name": "vadosware",
+      "fullname": "Vadosware",
+      "url": "http://vadosware.io/"
+    }
+  ]
+}

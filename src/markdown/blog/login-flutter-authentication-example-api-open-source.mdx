@@ -1,0 +1,203 @@
+---
+path: '/login-flutter-authentication-example-api-open-source/'
+
+title: |
+  Add Authentication to your Flutter Web Applications with Ory Kratos
+
+teaser: |
+  Add login, registration, user and profile management to Flutter web applications in minutes using the Ory Kratos open source project. Includes code examples for Dart!
+
+seo:
+  title: |
+    Authentication for Flutter Web Application
+  description: |
+    Add open source login to any Flutter Web App using free open source.
+  keywords: |
+    login, password recovery, account verification, auth, authentication, registration, flutter, dart, mobile, ios, android, mobile authentication, open source, ory, ory kratos
+
+publishedAt: '2022-02-15'
+author: iglu
+
+overline: |
+  Flutter Web Authentication
+tags:
+  - Guide
+  - Authentication
+  - Open Source
+  - Guest Author
+  - User Management
+---
+
+import CodeFromRemote from '../../components/freestanding/utils/codefromremote'
+
+In this guide, we will set up a hardened, fully functional authentication system
+with Flutter Web using [Ory Kratos](https://github.com/ory/kratos), an
+open-source identity and authentication service written in Golang.
+
+It will take you about ~10 minutes to complete this guide. This guide is for you
+if you are looking to:
+
+- Use the Ory Kratos API.
+- Create a custom user interface for the Ory Kratos Self Service Flows in
+  Flutter Web.
+
+Follow the step-by-step guide to add authentication to your Flutter web
+application and screens for:
+
+- Login
+- Registration
+- Profile management
+- Update password
+- Recover password
+- Verify account
+
+You can find the source code for this guide on GitHub:
+[iglu-ory-kratos-example](github.com/IGLU-Agency/iglu-ory-kratos-example).
+
+## Run the example
+
+To run the example, clone the
+[repository](https://github.com/IGLU-Agency/iglu-ory-kratos-example) to your
+computer.
+
+```bash
+git clone https://github.com/IGLU-Agency/iglu-ory-kratos-example.git
+cd iglu-ory-kratos-example
+```
+
+Should you not have Ory Kratos installed, please follow these
+[instructions](https://www.ory.sh/kratos/docs/install).
+
+To test the features of this example run Kratos locally:
+
+```bash
+kratos serve --config ./test/kratos.yml --dev
+```
+
+:::info
+
+Should you have problems running this command, you check the identity schema
+path in the Ory Kratos configuration `kratos.yml`.
+
+:::
+
+Now [run the project](https://docs.flutter.dev/get-started/test-drive) on Chrome
+and test how it works.
+
+## Flutter API Flows
+
+First of all, we implement flows essential for Ory Kratos to work.
+
+### Flutter User Login API Flow
+
+This code generates the `SelfServiceLoginFlow`, which will be used in the
+`Login` screen:
+
+<CodeFromRemote
+  lang="dart"
+  src="https://github.com/IGLU-Agency/iglu-ory-kratos-example/blob/master/lib/handlers.dart"
+  startAt="Future<SelfServiceLoginFlow?> initHandlersLoginScreen("
+  endAt="    }"
+/>
+
+#### Flutter User Registration API Flow
+
+This code generates the `SelfServiceRegistrationFlow`, which will be used in the
+`Registration` screen:
+
+<CodeFromRemote
+  lang="yml"
+  src="https://github.com/IGLU-Agency/iglu-ory-kratos-example/blob/master/lib/handlers.dart"
+  startAt="  Future<SelfServiceRegistrationFlow?> initHandlersRegistrationScreen("
+  endAt="  }"
+/>
+
+#### Flutter User Settings API Flow
+
+This code generates the `SelfServiceSettingsFlow`, which will be used in the
+`Settings` screen.
+
+<CodeFromRemote
+  lang="yml"
+  src="https://github.com/IGLU-Agency/iglu-ory-kratos-example/blob/master/lib/handlers.dart"
+  startAt="  Future<SelfServiceSettingsFlow?> initHandlersSettingsScreen("
+  endAt="  }"
+/>
+
+### Flutter Authentication Screens
+
+Now let us take a look at the different screens you can find in `lib/screens`.
+There isn't anything special happening there, but if you intend to change the
+layout you can look here. For example like so:
+
+#### Flutter Login Widget Example
+
+![Flutter Login Widget](./media/signin-flutter.png)
+
+The `User Login` widget uses the dart native code and performs a `User Login`
+API Flow.
+
+<CodeFromRemote
+  lang="yml"
+  src="https://github.com/IGLU-Agency/iglu-ory-kratos-example/blob/master/lib/screens/login_screen.dart"
+  startAt="  Widget build(BuildContext context) {"
+  endAt="  }"
+/>
+
+#### Flutter Registration Widget Example
+
+![Flutter Registration Widget](./media/signup-flutter.png)
+
+The `User Registration` widget uses the dart native code and performs a
+`User Registration` API Flow.
+
+<CodeFromRemote
+  lang="yml"
+  src="https://github.com/IGLU-Agency/iglu-ory-kratos-example/blob/master/lib/screens/signup_screen.dart"
+  startAt="  Widget build(BuildContext context) {"
+  endAt="  }"
+/>
+
+#### Flutter Navigation User Settings Widget Example
+
+![Flutter Navigation User Settings Widget](./media/settings-flutter.png)
+
+The `User Settings` widget performs a `User Settings` API Flow, receives the
+users authentication session and displays all relevant information, and also
+gives users the ability to change the password and to change their profile
+traits.
+
+<CodeFromRemote
+  lang="yml"
+  src="https://github.com/IGLU-Agency/iglu-ory-kratos-example/blob/master/lib/screens/settings_screen.dart"
+  startAt="  Widget build(BuildContext context) {"
+  endAt="    return scrollableContent;"
+/>
+
+### Adding Authentication to a Flutter Web App From Scratch
+
+With this example, you have a starter project to add user authentication out of
+the box with Ory Kratos in Flutter.
+
+#### Real Production-Ready App with Flutter Web
+
+If you are interested in seeing an actual project based on this, we invite you
+to look at our [unique solution](https://orykratos.iglu.dev/) that offers Ory
+Kratos based on this example.
+
+#### Conclusion
+
+We have now implemented Ory Kratos Authentication with Login, Registration,
+Profile Management in Flutter Web!  
+ Thanks for taking the time to follow this guide and hopefully, it helps you build
+secure web apps more smoothly. The IGLU Ory Kratos example is open source and available
+on [github](https://github.com/IGLU-Agency/iglu-ory-kratos-example), please consider
+starring the repository.
+
+:::info Ory without Setup
+
+If you want to skip set up and managing Kubernetes, Docker and others, check out
+[Ory Cloud](https://console.ory.sh/registration) for the fastest way to run Ory
+services.
+
+:::

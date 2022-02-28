@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+
+Sitemap: https://www.ory.sh/sitemap/sitemap-index.xml
+
+Sitemap: https://www.ory.sh/docs/sitemap.xml
