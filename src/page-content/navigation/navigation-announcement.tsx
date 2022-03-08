@@ -3,9 +3,10 @@ import React from 'react'
 import { PropTypes as AnnouncementProps } from '../../components/layouts/navigation/announcement'
 
 const jobs: AnnouncementProps = {
-  longText: 'Ory is hiring - shape the future of identity with us!',
-  shortText: 'Ory is hiring!',
-  link: '/jobs?mtm_campaign=job-banner'
+  longText:
+    'Get Ory Cloud Start Up subscription free for a year using code FIRST900',
+  shortText: 'Ory Cloud Start Up Plan!',
+  link: 'https://console.ory.sh/registration?preferred_plan=start-up'
 }
 
 const summit: AnnouncementProps = {

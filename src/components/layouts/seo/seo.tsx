@@ -25,14 +25,10 @@ const SEO = ({
       lang
     }}
     title={title}
-    titleTemplate={`%s${
-      process.env.GATSBY_DOMAIN === 'ory.sh' || !process.env.GATSBY_DOMAIN
-        ? ' - ory.sh'
-        : ''
-    }`}
-    link={
-      canonical ? [{ rel: 'canonical', key: canonical, href: canonical }] : []
-    }
+    titleTemplate={`%s`}
+    // link={
+    // canonical ? [{ rel: 'canonical', key: canonical, href: canonical }] : []
+    // }
     meta={[
       {
         name: `description`,

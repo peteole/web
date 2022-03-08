@@ -1,12 +1,26 @@
 ---
-templateKey: blogpost
 path: '/building-slack-bot-using-slack-events-api/'
-author: gen1us2k
-title: Building a Slack bot using the Events API
-teaser:
+
+title: |
+  Building a Slack bot using the Events API
+
+teaser: |
   In this article we'll show you a cost effective way to build bots for Slack
-overline: Community Onboarding
-publishedAt: 2022-02-23
+
+seo:
+  title: |
+    Learn how to build a custom Slack bot using the Events API
+  description: |
+    In this guide you will learn how to personalize community onboarding using a custom built Slack bot and host it on AWS Lambda for free.
+  keywords: |
+    community, auth, onboarding, slack events api, slack bot guide, slack bot, message bot, custom bot, community building
+
+publishedAt: '2022-02-23'
+author: gen1us2k
+
+overline: |
+  Community Onboarding
+
 published: true
 tags:
   - Open Source
@@ -117,7 +131,7 @@ Events API from Slack.
 
 ![Illustration of Gopher at work](media/gopher-at-work.png)
 
-<p style="text-align: center" >Let's build our bot, huh?</p>
+_Let's build our bot, huh?_
 
 ## Implementing the bot
 
@@ -203,16 +217,13 @@ To start everything up we need `cmd/mrrobot/main.go`:
 
 ### Configuring AWS Gateway
 
-1.  Create a new REST API.
-2.  In the "Resources" section create a new `ANY` method to handle requests to
-    `/` (check "Use Lambda Proxy Integration").
-
-![API Gateway index](https://akrylysov.github.io/algnhsa/apigateway-index.png)
-
-3.  Add a catch-all `{proxy+}` resource to handle requests to every other path
-    (check "Configure as proxy resource").
-
-![API Gateway catch-all](https://akrylysov.github.io/algnhsa/apigateway-catchall.png)
+1. Create a new REST API.
+1. In the "Resources" section create a new `ANY` method to handle requests to
+   `/` (check "Use Lambda Proxy Integration").
+   ![API Gateway index](https://akrylysov.github.io/algnhsa/apigateway-index.png)
+1. Add a catch-all `{proxy+}` resource to handle requests to every other path
+   (check "Configure as proxy resource").
+   ![API Gateway catch-all](https://akrylysov.github.io/algnhsa/apigateway-catchall.png)
 
 ## Final steps
 
@@ -245,14 +256,14 @@ zip: build_linux  ## Build and create a zip archive for deploying to AWS lambda
 ```
 
 1. Run `make zip`.
-2. Open your function on `AWS Lambda`.
-3. Choose `Upload from` under the source code section.
-4. Upload it and run.
-5. Choose your application on [Apps page](https://api.slack.com/apps) on Slack,
+1. Open your function on `AWS Lambda`.
+1. Choose `Upload from` under the source code section.
+1. Upload it and run.
+1. Choose your application on [Apps page](https://api.slack.com/apps) on Slack,
    click on `Add features and functionality` and choose `Event subscriptions`.
-6. Insert URL of your API Gateway to the `Request URL` field, pass the
+1. Insert URL of your API Gateway to the `Request URL` field, pass the
    verification step and click `Save`.
-7. Open `Subscribe to bot events` and choose `team_join` event and then press
+1. Open `Subscribe to bot events` and choose `team_join` event and then press
    `Save`.
 
 That's it. You can now invite a new member to your Slack and test the bot.
