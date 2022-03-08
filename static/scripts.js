@@ -1,7 +1,13 @@
 (function () {
   // only run the script if we are on production
   const host = window.location.hostname
-  if(host.indexOf('localhost') === -1 && host.indexOf('127.0.0.1') === -1 && host.indexOf('netlify') === -1) {
+  if(host === 'www.ory.sh' || host === 'console.ory.sh') {
+
+    // add gtag wrapper
+    function gtag() {
+      dataLayer.push(arguments);
+    }
+
     const loadConsentBanner = () => {
       const dependencies = [
         'https://cdn.iubenda.com/cs/ccpa/stub.js',
