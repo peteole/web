@@ -1,8 +1,20 @@
 (function () {
   // only run the script if we are on production
   const host = window.location.hostname
+  const path = window.location.pathname
+  const pathLevel1 = path.split('/')[1]
   if(host === 'www.ory.sh' || host === 'console.ory.sh') {
 
+    // define container id based on application
+    // set default | www
+    let containerId = 'GTM-5JC2SVK'
+    if (host === 'console.ory.sh') {
+      containerId = 'GTM-PK4CSNL'
+    }
+    else if (host === 'www.ory.sh' &&  pathLevel1 === 'docs') {
+      containerId = 'GTM-NTT7RMX'
+    }
+    
     const loadConsentBanner = () => {
       const dependencies = [
         'https://cdn.iubenda.com/cs/ccpa/stub.js',
@@ -133,7 +145,7 @@
       // Initialize tag manager first - no tags fire until consent is expressed
       // Load consent banner after so we're sure tag manager is active to dispatch
       // consent events to
-      initializeTagManger(window, document, 'script', 'dataLayer', window.__gtm_id || 'GTM-5JC2SVK')
+      initializeTagManger(window, document, 'script', 'dataLayer', containerId)
         .then(() => loadConsentBanner())
         .then(() => {
           // Future sequential stuff that is dependent on consent banner goes here
