@@ -1,4 +1,12 @@
 window.initAnalytics = (containerId) => {
+  const dispatch = function () {
+    window.dataLayer.push(arguments)
+  }
+
+  const dispatchCustom = (evt) => {
+    window.dataLayer.push(evt)
+  }
+
   const loadConsentBanner = () => {
     const dependencies = [
       'https://cdn.iubenda.com/cs/ccpa/stub.js',
@@ -34,25 +42,24 @@ window.initAnalytics = (containerId) => {
 
   const eventsOnBannerInteraction = {
     onPreferenceExpressed: (preference = {}) => {
-      const dataLayer = window.dataLayer
-      dataLayer.push({
+      dispatchCustom({
         iubenda_ccpa_opted_out: window._iub.cs.api.isCcpaOptedOut()
       })
       if (preference.purposes) {
         for (const category in preference.purposes) {
           if (preference.purposes[category]) {
             const purpose = `iubenda_consent_given_purpose_${category}`
-            dataLayer.push({
+            dispatchCustom({
               event: purpose,
               [purpose]: 'true'
             })
             if (category == 4) {
-              dataLayer.push('consent', 'update', {
+              dispatch('consent', 'update', {
                 analytics_storage: 'granted'
               })
             }
             if (category == 5) {
-              dataLayer.push('consent', 'update', {
+              dispatch('consent', 'update', {
                 ad_storage: 'granted'
               })
             }
@@ -61,12 +68,12 @@ window.initAnalytics = (containerId) => {
       }
     },
     onPreferenceNotNeeded: () => {
-      dataLayer.push({
+      dispatchCustom({
         event: 'iubenda_preference_not_needed',
         iubenda_preference_not_needed: 'true'
       })
       // Update consent settings
-      dataLayer.push('consent', 'update', {
+      dispatch('consent', 'update', {
         ad_storage: 'granted',
         analytics_storage: 'granted'
       })
@@ -77,17 +84,17 @@ window.initAnalytics = (containerId) => {
   window.dataLayer = window.dataLayer || []
 
   // Set default values for tag manager consent mode
-  dataLayer.push('consent', 'default', {
+  dispatch('consent', 'default', {
     ad_storage: 'denied',
     analytics_storage: 'denied',
     wait_for_update: 2000
   })
 
   // Improve campaign click measurement quality
-  dataLayer.push('set', 'url_passthrough', true)
+  dispatch('set', 'url_passthrough', true)
 
   // Further redact your ads data
-  dataLayer.push('set', 'ads_data_redaction', true)
+  dispatch('set', 'ads_data_redaction', true)
 
   const _iub = window._iub || {}
   _iub.csConfiguration = {
