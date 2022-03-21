@@ -2,10 +2,10 @@
 path: '/how-to-defend-your-sso-from-all-attack-types/'
 
 title: |
-  Attack vectors to SSO service
+  Attack vectors to authentication service
 
 teaser: |
-  In this article we'll most popular attack vectors to authentication service
+  This article shows the most popular attack vectors to authentication service
 
 seo:
   title: |
@@ -27,10 +27,37 @@ tags:
   - Guide
 ---
 
+Software engineers write code. This code goes to production and is used by end-users. Sometimes even the perfect and clean code has bugs, and some of them can be security issues. Hence, every software engineer who writes code for end-users needs to care about their code's security.
 
-## Intro
+One needs to think differently to write robust and secure programs. You can look at the following list of reasons that could go wrong with your application:
 
-## Attack vectors and how to defend them
+- Hardware can die. You can catch a kernel panic, RAM or SSD can die eventually, and systems crash. You need to have recovery mechanisms in that case or enable redundant services in your infrastructure. These cases are simple because you can have [a long-term corrupted data](https://www.pgcon.org/2017/schedule/attachments/453_corruption-pgcon-2017.pdf)
+- Netsplits
+- Cascade errors
+- Time is relative
+- Messages can be missing.
+- Deadlocks
+- Malicious nodes
+- Messages can duplicate
+- No guarantees about order and time of delivery
+
+Same thing with security issues. Security can be challenging, and modern application development framework gives you some hints to go with to establish your boundaries
+
+- What are your business priorities?
+- What is the worst possible scenario?
+- What are your immovable constraints?
+- What data is this solution storing/processing?
+- What skills does your team have?
+- What is the timeline for the project?
+
+You need to draw a line and have boundaries because one can get unmaintainable code in a couple of months. We have established boundaries, and let's look at possible attack vectors to our authentication service.
+
+## Attack vectors
+
+Let's look at the information sponsor of almost all blog posts on the internet, also known as Wikipedia.
+In computer security, an attack vector is a specific path, method, or scenario that can be exploited to break into an IT system, thus compromising its security.
+An attack vector may be exploited manually, automatically, or through a combination of manual and automatic activity.
+Often, this is a multi-step process. For instance, malicious code (code that the user did not consent to being run and that performs actions the user would not consent to) often operates by being added to a harmless seeming document made available to an end user. When the unsuspecting end user opens the document, the malicious code in question (known as the payload) is executed and performs the abusive tasks it was programmed to execute, which may include things such as spreading itself further, opening up unauthorized access to the IT system, stealing or encrypting the user's documents, etc.
 
 ## Password guessing
 
