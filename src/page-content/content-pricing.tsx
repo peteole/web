@@ -37,8 +37,8 @@ export const pricing: Pick<
           >
             Ory Acceleration Program Form
           </Button>{' '}
-          and get access to the Start Up or Growth plan free for one year -
-          program ends March 1st 2022.
+          and get access to the Start Up or Growth plan free for 6 month -
+          program ends 1st of September 2022.
         </>
       )
     },
