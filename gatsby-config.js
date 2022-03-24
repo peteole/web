@@ -122,6 +122,7 @@ module.exports = {
               // the content container as this plugin uses this as the
               // base for generating different widths of each image.
               maxWidth: 860,
+              quality: 80,
               tracedSVG: true,
               loading: 'lazy',
               withWebp: true
