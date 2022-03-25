@@ -78,6 +78,10 @@
         {
           "title": "Oathkeeper",
           "to": "/oathkeeper"
+        },
+        {
+          "title": "Contribution Guidelines",
+          "to": "/contribute"
         }
       ]
     },

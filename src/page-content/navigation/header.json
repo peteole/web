@@ -83,6 +83,11 @@
           "title": "Talks & Presentations",
           "description": "Watch VODs of Ory Summit 21",
           "to": "/summit/2021"
+        },
+        {
+          "title": "Contribution Guidelines",
+          "description": "Get involved in Ory Open Source",
+          "to": "/contribute"
         }
       ]
     },
@@ -172,6 +177,11 @@
           {
             "title": "Talks & Presentations",
             "to": "/summit/2021"
+          },
+          {
+            "title": "Contribution Guidelines",
+            "description": "Get involved in Ory Open Source",
+            "to": "/contribute"
           }
         ]
       },
