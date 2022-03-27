@@ -26,44 +26,31 @@ tags:
   - Open Source
   - Guide
 ---
-
 Software engineers write code. This code goes to production and is used by end-users. Sometimes even the perfect and clean code has bugs, and some of them can be security issues. Hence, every software engineer who writes code for end-users needs to care about their code's security.
+One needs to think differently to write robust and secure programs. This article shows the most common attack vectors to authentication services and how to avoid data security breaches.
 
-One needs to think differently to write robust and secure programs. You can look at the following list of reasons that could go wrong with your application:
-
-- Hardware can die. You can catch a kernel panic, RAM or SSD can die eventually, and systems crash. You need to have recovery mechanisms in that case or enable redundant services in your infrastructure. These cases are simple because you can have [a long-term corrupted data](https://www.pgcon.org/2017/schedule/attachments/453_corruption-pgcon-2017.pdf)
-- Netsplits
-- Cascade errors
-- Time is relative
-- Messages can be missing.
-- Deadlocks
-- Malicious nodes
-- Messages can duplicate
-- No guarantees about order and time of delivery
-
-Same thing with security issues. Security can be challenging, and modern application development framework gives you some hints to go with to establish your boundaries
-
-- What are your business priorities?
-- What is the worst possible scenario?
-- What are your immovable constraints?
-- What data is this solution storing/processing?
-- What skills does your team have?
-- What is the timeline for the project?
-
-You need to draw a line and have boundaries because one can get unmaintainable code in a couple of months. We have established boundaries, and let's look at possible attack vectors to our authentication service.
-
-## Attack vectors
-
-Let's look at the information sponsor of almost all blog posts on the internet, also known as Wikipedia.
-In computer security, an attack vector is a specific path, method, or scenario that can be exploited to break into an IT system, thus compromising its security.
-An attack vector may be exploited manually, automatically, or through a combination of manual and automatic activity.
-Often, this is a multi-step process. For instance, malicious code (code that the user did not consent to being run and that performs actions the user would not consent to) often operates by being added to a harmless seeming document made available to an end user. When the unsuspecting end user opens the document, the malicious code in question (known as the payload) is executed and performs the abusive tasks it was programmed to execute, which may include things such as spreading itself further, opening up unauthorized access to the IT system, stealing or encrypting the user's documents, etc.
+## What is an attack vector and attack surface
+An attack vector is a path that a hacker takes to exploit cybersecurity vulnerabilities. In contrast, an attack surface is all of the public and privately exposed nexus points of your company's data and human or software interaction. Let's start with password guessing
 
 ## Password guessing
 
-- bruteforce (next auth delay, password strength check)
-- Dictionary guessing (Antifraud service, password strength check)
-- Rainbow tables (bcrypt, correct usage of salt)
+Bruteforce attack is a simple and powerful way to gain access for an unauthorized user. Usually, enumeration is a key, and it's simply an automated way to check different credentials and find credentials that give you access to the system.
+
+There are different types of brute force attacks performed by a hacker. For instance, a simple bruteforce attack does not use any software, and a hacker enters credentials manually. The next level of this type of attack is dictionary attacks. In that case, a hacker can use scripts to perform an attack and dictionaries of the most commonly used passwords.
+
+To avoid data breaches on your system, one should implement the next authentication delay and password strength check. in addition, a good idea can be to implement a feature to check user's passwords in leaked databases. https://haveibeenpwned.com/ can be an excellent candidate to integrate with.
+
+In the worst-case scenario, password hashes can leak from for database. An attacker can use rainbow tables to crack passwords. The rainbow table itself refers to a precomputed table that contains the password hash value for each plain text character used during the authentication process. If hackers gain access to the list of password hashes, they can crack all passwords very quickly with a rainbow table.
+
+Usage of salt and strong hashing algorithm can reduce risk of leaking passwords.
+
+Key takeaways to summarize this part
+
+- Use next authentication delay. Implement exponental back-off for failed attempts
+- Check password strength
+- Use bcrypt/Argon2 or any other strong hashing algorithm with correcy usage of salt
+
+Let's continue with the next type of attack
 
 ## Data interception
 
@@ -95,3 +82,14 @@ Often, this is a multi-step process. For instance, malicious code (code that the
 - passwords database leak from server (bcrypt, correct usage of salt)
 - inner interception of network traffic (SSL usage between services, key and certificates management, certificate short lifetime)
 - logfiles leak from server (logs filtration, masking of passwords and personal data)
+
+
+- What are your business priorities?
+- What is the worst possible scenario?
+- What are your immovable constraints?
+- What data is this solution storing/processing?
+- What skills does your team have?
+- What is the timeline for the project?
+
+You need to draw a line and have boundaries because one can get unmaintainable code in a couple of months. We have established boundaries, and let's look at possible attack vectors to our authentication service.
+
