@@ -34,15 +34,12 @@ An attack vector is a path that a hacker takes to exploit cybersecurity vulnerab
 
 ## Password guessing
 
-Bruteforce attack is a simple and powerful way to gain access for an unauthorized user. Usually, enumeration is a key, and it's simply an automated way to check different credentials and find credentials that give you access to the system.
+Bruteforce attack is a simple and powerful way to gain access for an unauthorized user. Enumeration is a key for this type of attack, and it's simply an automated way to check different credentials and find credentials that give you access to the system.
 
-There are different types of brute force attacks performed by a hacker. For instance, a simple bruteforce attack does not use any software, and a hacker enters credentials manually. The next level of this type of attack is dictionary attacks. In that case, a hacker can use scripts to perform an attack and dictionaries of the most commonly used passwords.
+There are different types of brute force attacks performed by a hacker. For instance, a simple bruteforce attack does not use any software, and a hacker enters credentials manually. The next level of this type of attack is dictionary attacks when a hacker can use scripts and dictionaries with commonly used passwords.
 
-To avoid data breaches on your system, one should implement the next authentication delay and password strength check. in addition, a good idea can be to implement a feature to check user's passwords in leaked databases. https://haveibeenpwned.com/ can be an excellent candidate to integrate with.
-
-In the worst-case scenario, password hashes can leak from for database. An attacker can use rainbow tables to crack passwords. The rainbow table itself refers to a precomputed table that contains the password hash value for each plain text character used during the authentication process. If hackers gain access to the list of password hashes, they can crack all passwords very quickly with a rainbow table.
-
-Usage of salt and strong hashing algorithm can reduce risk of leaking passwords.
+To avoid data breaches on your system, one should implement the next authentication delay and password strength check. In addition, a good idea can be to implement a feature to check user's passwords in leaked databases. Services like [haveibeenpwned](https://haveibeenpwned.com/) can be an excellent candidate to integrate with.
+In the worst-case scenario, password hashes can leak from for database. An attacker can use rainbow tables to crack passwords. The rainbow table itself refers to a precomputed table that contains the password hash value for each plain text character used during the authentication process. If hackers gain access to the list of password hashes, they can crack all passwords very quickly with a rainbow table. A solution to decrease security risks caused by this type of attack can be using salt with a strong hashing algorithm.
 
 Key takeaways to summarize this part
 
@@ -50,33 +47,68 @@ Key takeaways to summarize this part
 - Check password strength
 - Use bcrypt/Argon2 or any other strong hashing algorithm with correcy usage of salt
 
-Let's continue with the next type of attack
+Let's continue with data interception and phishing attacks
 
-## Data interception
+## Data interception attacks
 
-- Wifi sniffing (SSL)
-- MitM interception (SSL)
-- keylogger (copying of input) (2FA)
-- Screen spying (2FA)
-- cookie leak (XSS or virus/trojan) (oauth2/short cookie lifetime, privilegies separation)
-- SSL vulnerabilities (security audit, periodical check of SSL configuration) (Shout out to compliances)
+The main target for the hacker attack is a human in the real world. A regular user does not care about password security and does not use solutions like 1password, bitwarden to store their passwords. In addition, a user uses one password for all systems because it's easy to remember and manage. Hence, we have Data interception, and Phishing attacks exist because it makes it easier to access the target system. Here's some bad tips from XKCD comics for regular user
 
-## Phishing attacks
+![XKCD Security](https://www.explainxkcd.com/wiki/images/5/56/security_advice.png)
 
-- Phishing pages (Bind cookie to user ip)
-- MitM interception (SSL, PKP, HSTS) (https://en.wikipedia.org/wiki/HTTP_Public_Key_Pinning)
-- DNS poison (SSL, PKP, HSTS)
-- Browser poison (2FA OCRA+TDS)
--  "Connect" request interception (CSRF token on auth forms )
+However, the end goal of this attack is to intercept sensitive data and it can have the following steps:
 
-## Social Engineering
+- Wi-fi sniffing
+- Man-in-the-middle interception
+- Keylogger and screen spying software
+- Cookie leak caused by XSS or Virus/Trojan software
+- SSL vulnerabilities
+
+A solution to prevent these attacks can be SSL encryption usage. It can help you to avoid Wifi sniffing and MitM attacks. Yet it opens possibilities to exploit SSL vulnerabilities, and it would be an excellent idea to have security audits and periodic configuration checks by the operations/development team. Nevertheless, SSL encryption is not enough to prevent keylogger/screen spying attacks because they run on the user's device, and we should configure 2FA to avoid security risks.
+
+Two-factor authentication adds an additional step to the authentication process. Usually, a user enters a username/password to authenticate, and then they'll be required to provide another piece of information. The best way is to use a Time-based one-time-password or HMAC-based one-time-password. One can use SMS authentication for 2FA for usability, but it can be [less secure for your system](https://securityboulevard.com/2021/12/why-using-sms-authentication-for-2fa-is-not-secure/)
+
+Another type of attack is cookie leak. Well, it means that an attacker gained access to your server-side cookie storage, and now she can use any cookie to exploit. A solution to prevent this attack can be a short cookie lifetime and the usage of the least privileges. That's why Ory Kratos has a default value for `session.cookie.lifespan` 1h.
+
+Key takeaways to summarize this part
+
+- Use SSL everywhere with periodical check of SSL configuration and security audits
+- Use 2FA to protect user accounts
+- Use short cookie lifetime
+- Apply "least privilege" and "privileges separation" principles
+
+Let's continue with phishing attacks
+
+## Phishing attacks and social engineering
+
+Social engineering is the art of manipulating people, so they give up confidential information. Phishing attacks are a subset of social engineering attacks that imitate trusted sources and capture sensitive data. You can find many examples of social engineering in the Takedown movie, and basically, social engineering and phishing attacks come together. Here's an example of social engineering + phishing attack
+
+Let's meet George. George is into Google technologies, and we need to steal his password for google services. George knows Andrew, and they work together. We know that George uses 2FA to secure his Google account. How can Andrew steal George's account?
+
+Andrew configures a web server with a copy of the accounts.google.com webpage with the following logic
+
+- Save credentials to a text file
+- Shows "Loading..."
+- and redirects to https://developers.google.com/
+
+Andrew performs a DNS poison attack and spoofs two domains that point to the web server with the exact copy of the accounts.google.com webpage.
+Andrew configures a web server with two hosts: acc.google.com and dev.google.com. dev.google.com redirects to acc.google.com. After some testing with redirection, Andrew can perform an attack.
+
+He sends George a simple message like, "Hey, look what Google introduced in the new version of Google assistant http://dev.account.com/assistant". George opens the link, gets redirected to acc.google.com, enters credentials, and sees a webpage. Alas, his account was compromised a couple of minutes ago. Andrew needs to take his phone for a couple of minutes to gain full access to George's Google account.
+
+Here are recommendations to avoid these attacks on your authentication service
+
+- Bind a cookie to a user IP to prevent the usage of phishing pages.
+- Configure SSL with [HSTS](https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security) and [Certificate Transparency](https://developer.mozilla.org/en-US/docs/Web/Security/Certificate_Transparency)
+- Implement block/allow access procedures in case of device stealing for your service.
+- Use CSRF tokens on authentication forms to avoid "Connect" request interception
+
+
+## Social Engineering and inner threats
 
 - 2FA leak (notifications about user's activity, antifraud, access blocking procedure)
 - Password leak (2FA, oauth2)
 - Access recovery (Access recovery)
 - Device stealing (block/allow access procedures)
-
-## inner threats
 
 - sessions leak from server (short session lifetime)
 - passwords database leak from server (bcrypt, correct usage of salt)
