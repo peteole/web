@@ -17,7 +17,7 @@ export const sideNav: Pick<NavProps, 'sideNav'> = {
       style={'filled'}
       openInNewWindow={false}
     >
-      Try Free
+      Get Started
     </Button>
   ]
 }

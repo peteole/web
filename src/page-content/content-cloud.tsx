@@ -31,18 +31,18 @@ export const hero_alt: HeroImageProps = {
   id: 'cloud.hero',
   title: (
     <>
-      <span className={'is-themed-primary'}> Cloud native </span> identity
+      <span className={'is-themed-primary'}> Ory Cloud </span> uses industry standards
     </>
   ),
   description: (
     <>
-      Integrate modern identity services with Ory Cloud. Batteries included.
-      <span className={'is-themed-primary'}> Based on Ory Open Source. </span>
+      Ory Cloud is API-first, customizable, privacy conform and secure and deploys all Ory services in concert - at any scale, across the globe.
+      <span className={'is-themed-primary'}>  </span>
     </>
   ),
   buttons: [
     {
-      ctaTitle: 'Test Now',
+      ctaTitle: 'Get Started',
       style: 'filled',
       to: 'https://console.ory.sh/registration'
     }
@@ -212,7 +212,7 @@ export const featureContentUX: FeatureContentProps = {
     </>
   ),
   button: {
-    ctaTitle: 'Sign up',
+    ctaTitle: 'Get Started',
     to: 'https://console.ory.sh/registration',
     iconRight: ArrowRight
   },
@@ -353,7 +353,7 @@ export const quickstart: QuickstartProps = {
   ),
   buttons: [
     {
-      ctaTitle: 'Sign up',
+      ctaTitle: 'Get Started',
       style: 'filled',
       to: 'https://console.ory.sh/registration'
     },

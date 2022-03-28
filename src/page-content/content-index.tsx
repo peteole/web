@@ -63,7 +63,7 @@ export const featureContentCloud: FeatureContentProps = {
     </>
   ),
   button: {
-    ctaTitle: 'Test now',
+    ctaTitle: 'Get Started',
     to: 'https://console.ory.sh/registration',
     iconRight: ArrowRight
   },
