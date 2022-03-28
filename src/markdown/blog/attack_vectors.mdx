@@ -102,26 +102,4 @@ Here are recommendations to avoid these attacks on your authentication service
 - Implement block/allow access procedures in case of device stealing for your service.
 - Use CSRF tokens on authentication forms to avoid "Connect" request interception
 
-
-## Social Engineering and inner threats
-
-- 2FA leak (notifications about user's activity, antifraud, access blocking procedure)
-- Password leak (2FA, oauth2)
-- Access recovery (Access recovery)
-- Device stealing (block/allow access procedures)
-
-- sessions leak from server (short session lifetime)
-- passwords database leak from server (bcrypt, correct usage of salt)
-- inner interception of network traffic (SSL usage between services, key and certificates management, certificate short lifetime)
-- logfiles leak from server (logs filtration, masking of passwords and personal data)
-
-
-- What are your business priorities?
-- What is the worst possible scenario?
-- What are your immovable constraints?
-- What data is this solution storing/processing?
-- What skills does your team have?
-- What is the timeline for the project?
-
-You need to draw a line and have boundaries because one can get unmaintainable code in a couple of months. We have established boundaries, and let's look at possible attack vectors to our authentication service.
-
+## Conclusion
