@@ -285,7 +285,7 @@ export const team: TeamProps = {
       social: [
         {
           network: SocialNetworks.github,
-          href: 'https://github.com/MicLeey'
+          href: 'https://github.com/micleyman'
         }
       ],
       img: (
@@ -295,7 +295,7 @@ export const team: TeamProps = {
           aspectRatio={1}
           loading="lazy"
           className="responsive"
-          alt="Michael Leey"
+          alt="Michael Leyman"
           src="../../images/team/michael.png"
         />
       )
