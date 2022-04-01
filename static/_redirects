@@ -287,6 +287,11 @@ https://www.ory.sh/docs/ecosystem/styleguide https://github.com/ory/docs/blob/ma
 https://www.ory.sh/docs/ecosystem/styleguide/testing https://github.com/ory/docs/blob/master/README.md 302!
 https://www.ory.sh/docs/ecosystem/styleguide/templates https://github.com/ory/docs/blob/master/README.md 302!
 
+https://www.ory.sh/docs/kratos/contributing https://github.com/ory/kratos/blob/master/CONTRIBUTING.md
+https://www.ory.sh/docs/oathkeeper/contributing https://github.com/ory/oathkeeper/blob/master/CONTRIBUTING.md
+https://www.ory.sh/docs/hydra/contributing  https://github.com/ory/hydra/blob/master/CONTRIBUTING.md
+https://www.ory.sh/docs/keto/contributing  https://github.com/ory/keto/blob/master/CONTRIBUTING.md
+
 ### END PUT ANY DOCS REDIRECTS HERE
 
 # Proxy to new docs
