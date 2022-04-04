@@ -9,17 +9,17 @@ teaser: |
 
 seo:
   title: |
-    Learn how to build a custom Slack bot using the Events API
+    This article shows the most popular attack vectors to authentication service
   description: |
     In this guide you will learn how to personalize community onboarding using a custom built Slack bot and host it on AWS Lambda for free.
   keywords: |
-    community, auth, onboarding, slack events api, slack bot guide, slack bot, message bot, custom bot, community building
+    attack vectors, auth, security, phishing attack
 
 publishedAt: '2022-02-23'
 author: gen1us2k
 
 overline: |
-  Community Onboarding
+  Authentication Attack Vectors
 
 published: true
 tags:
@@ -101,5 +101,8 @@ Here are recommendations to avoid these attacks on your authentication service
 - Configure SSL with [HSTS](https://en.wikipedia.org/wiki/HTTP_Strict_Transport_Security) and [Certificate Transparency](https://developer.mozilla.org/en-US/docs/Web/Security/Certificate_Transparency)
 - Implement block/allow access procedures in case of device stealing for your service.
 - Use CSRF tokens on authentication forms to avoid "Connect" request interception
+- Consider using [WebAuthn](https://webauthn.io/) for passwordless flows in browser
 
 ## Conclusion
+
+I hope that reading this article gave you a brief introduction to the most common attack vectors and how you can avoid vulnerabilities in your enterprise. Besides the attack vectors mentioned in this blog post, it is essential to note that insecure practices by employees can be a significant vulnerability related to the authentication process. After all, employees are the weakest link, and attack vectors such as phishing attacks are designed to exploit this vulnerability.
