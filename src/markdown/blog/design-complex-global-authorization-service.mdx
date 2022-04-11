@@ -6,9 +6,9 @@ title: >
 
 seo:
   description: >
-    Design a complex authorization service with billions of relations, groups and requests.
-    This article will demonstrate Ory Keto, the open source implementation of Google Zanzibar
-    access control.
+    Design a complex authorization service with billions of relations, groups
+    and requests. This article will demonstrate Ory Keto, the open source
+    implementation of Google Zanzibar access control.
   title: >
     Global authorization service architecture
 
@@ -20,8 +20,9 @@ overline: >
 category: Article
 
 teaser: >
-  Design a complex authorization service with billions of relations, groups and requests.
-  
+  Design a complex authorization service with billions of relations, groups and
+  requests.
+
 tags:
   - Open Source
   - Access Control
@@ -29,72 +30,89 @@ tags:
   - Architecture
 ---
 
-
-This article is based on the "Design Complex Authorization with Ory Keto" talk by @zepatrik.
-You can watch the talk here:
+This article is based on the "Design Complex Authorization with Ory Keto" talk
+by [zepatrik](https://github.com/zepatrik/). You can watch the full talk here:
 
 https://www.youtube.com/watch?v=lGRMYkQrNb0
 
 ## Introduction
 
-Ory Keto is a service that you can use to implement authorization in any application. Authorization means it can answers the questions "Is this user allowed to do this?".
-Ory Keto is inspired by the paper that Google wrote about their acccess control system called Zanzibar and draws a lot of the theoretical background from the implementation that Google chose. 
-In my last post I wrote about the theoretical background of the Zanzibar papers and the challenges that such a global access control system with billions of users faces. 
-In this post I will give a highlevel overviwe on how Keto works and then jummp into some concrete examples.
+Ory Keto is a service that you can use to implement authorization in any
+application. Authorization means it can answers the questions "Is this user
+allowed to do this?". Ory Keto is inspired by the paper that Google wrote about
+their access control system called Zanzibar and draws a lot of the theoretical
+background from the implementation that Google chose. In
+[my last post](https://www.ory.sh/keto-zanzibar-evolution/) I wrote about the
+theoretical background of the
+[Zanzibar paper](https://research.google/pubs/pub48190/) and the challenges that
+a global access control system with billions of users has to solve. In this post
+I will give a high-level overview on how Keto works and then jump into some
+concrete examples.
 
-So what does it mean that Ory Keto is based on the zanzibar paper? 
-The core principle of the google acccess zanzibar  is that of a graph of relations, and I will come in a moment to why this graph is great. 
-< show image here>
+So what does it mean that Ory Keto is based on the Zanzibar paper? The core
+principle is that of a graph of relations, and bear with me to learn why this is
+the core of Ory Keto performance.
 
-## Graph of relations
+## Ory Keto basic principles
 
-The basic data structure is relation tuples. There are two types of relation tuples
--  Example here: "object0#access@user0"
->a relation tuple that describes a relation between an object and a subject which sounds pretty generic and also is pretty generic because objects, relations and subjects are just strings
-What Ory Keto does in with this type of relation tuple, is it will just give you all the connections between those relations
+The basic data structure is relation tuples. There are two types of relation
+tuples:
 
-- second type: subject sets: "object1#access@(object0#acccess)"
->(everyone who has access to object zero -so this part is the subject set - so everyone who has access to object zero also has access to object one)
-subject sets are a way to indirect and define relations based on other relations.
+- "object0#access@user0" This relation tuple describes a relation between an
+  object and a subject. This is very generic because objects, relations and
+  subjects are just strings. Ory Keto can now give you all the connections
+  between relations for this relation tuple.
 
-Together with the first type of relation tuples this allows to define permissions, so for example you can say if you have this relation or that relation you have access. 
+- "object1#access@(object0#acccess)" This relation tuple is very similar to the
+  one above, but includes subject sets - in plain English this means that
+  everyone who has access to object0 - this part is the subject set - also has
+  access to object1). Subject sets are a way to define indirect relations based
+  on other relations.
 
-So why a graph of relations?
+With these types of relation tuples we can now define permissions.
 
-the basic idea behind this is that these relations result in a graph of relations. This graph is just a very standard directed graph and we can apply standard graph algorithms to this graph and in such a case or such an algorithm would be to actually do a permission check
-So in practice that is done by having a reachability problem on the graph, so if an object is reachable through a specific relation from a subject it's considered that this is a true request. 
-So the Check API will basically allow the request to go through. And if there is no connection then it will stay false.
-And thats on a basic level how Ory Keto works.
+### Graph of relations
 
-so you can also build representations of this graph of relations and do audits on it, and so have a very fine grained control over who can access what and so on.
+The relation tuples we define result in a graph of relations. This graph is just
+a very standard directed graph and we can apply standard graph algorithms to it.
+One such algorithm would be to do a permission check. In practice that is done
+by solving a
+[reachability problem](https://en.wikipedia.org/wiki/Reachability_problem) on
+the graph. If an object is reachable through a specific relation from a subject
+it's considered that this is a true request. So the Check API will allow the
+request to go through and if there is no connection then it will stay false.  
+You can also build representations of this graph of relations and do audits on
+it, and so have a very fine grained control over who can access what.
 
-- very basic idea behind the Zanzibar paper or the graph based permissions
+### Namespaces
 
-(screens of how the relations work out when you start to resolve them and all of these indirections so you can do audits on basically this graph structure)
-
-- namespaces: 
-Namespaces are a way to organize objects to prevent naming conflicts - what means you can distinguish two obejcts that have the same id althought they should neer have the same ID. They can also be later on used for some extra relational features, so for example instead of adding a relation namespaces can be used to exclude froma. relation. 
+Namespaces are a way to organize objects to prevent naming conflicts - what
+means you can distinguish two objects that have the same id although they should
+never have the same ID. They can also be later on used for some extra relational
+features, so for example instead of adding a relation namespaces can be used to
+exclude from a relation.
 
 ## Lets hack
 
-
-gh repo clone zepatrik/ory-summit21-talk
-cd ory-summit21-talk
-npm i
-npm start
+gh repo clone zepatrik/ory-summit21-talk cd ory-summit21-talk npm i npm start
 
 Our example starts a basic NodeJS server:
+
 ```
 https://raw.githubusercontent.com/zepatrik/ory-summit21-talk/main/examples/server.ts
 ```
 
-The server listen to the port set, some course headers, and here handleGet and handlePost. A simple cloud storage, key is the filename, and value is the content.
+The server listen to the port set, some course headers, and here handleGet and
+handlePost. A simple cloud storage, key is the filename, and value is the
+content.
 
-In this presentation we have a built-in client - so we can launch that client as well.
-Navigate to http://localhost:9000/ and press `c` to launch the client overlay. ignore the username field for now.
+In this presentation we have a built-in client - so we can launch that client as
+well. Navigate to http://localhost:9000/ and press `c` to launch the client
+overlay. ignore the username field for now.
 
-add example.txt in the filename and foo in the contents and press POST
-You will get this output
+add example.txt in the filename and foo in the contents and press POST You will
+get this output
+
 ```
 fetch('http://localhost:7000/example.txt', {
       method: 'POST',
@@ -103,27 +121,32 @@ fetch('http://localhost:7000/example.txt', {
       },
       body: content
     })
-``` 
+```
 
-POST writes the file so it reads the body and writes to the file.
-The client also has a handleGet fuction which reads a file and serves it, if possible. handleGet returns an error if it can't find it, can't open it for whatever reason.
+POST writes the file so it reads the body and writes to the file. The client
+also has a handleGet fuction which reads a file and serves it, if possible.
+handleGet returns an error if it can't find it, can't open it for whatever
+reason.
 
 See the full code for this basic client:
+
 ```
 https://raw.githubusercontent.com/zepatrik/ory-summit21-talk/main/examples/handlers-0.ts
 ```
 
 ### Create relations
 
-We want to track the ownership of these files now.
-We want to then later add permissions so the owners can read, can modify, can update a file and can change the sharing permissions and more.
-To achieve this we add the following to our handler:
+We want to track the ownership of these files now. We want to then later add
+permissions so the owners can read, can modify, can update a file and can change
+the sharing permissions and more. To achieve this we add the following to our
+handler:
+
 ```
 https://raw.githubusercontent.com/zepatrik/ory-summit21-talk/main/examples/handlers-1.ts
 (add diff here) (or break down below)
 ```
-Some imports and helper function 
-This is the code to create relation tuples:
+
+Some imports and helper function This is the code to create relation tuples:
 
 ```jsx https://raw.githubusercontent.com/zepatrik/ory-summit21-talk/main/examples/handlers-1.ts
 const addOwnershipRelation = (filePath: string, username: string) => {
@@ -156,18 +179,20 @@ const addOwnershipRelation = (filePath: string, username: string) => {
 ```
 
 Now we use the `files` namespaces and we set the path of the file as the object.
-There is also an owner relationship `relationTuple.setRelation('owner')`
-and as the subject we set the username
-``` https://raw.githubusercontent.com/zepatrik/ory-summit21-talk/main/examples/handlers-1.ts
+There is also an owner relationship `relationTuple.setRelation('owner')` and as
+the subject we set the username
+
+```https://raw.githubusercontent.com/zepatrik/ory-summit21-talk/main/examples/handlers-1.ts
   const sub = new acl.Subject()
   sub.setId(username)
   relationTuple.setSubject(sub)
 ```
-And then we do an API call `writeRequest`  to Ory Keto to store this relation.
+
+And then we do an API call `writeRequest` to Ory Keto to store this relation.
 
 Integration into the POST handler:
 
-``` https://raw.githubusercontent.com/zepatrik/ory-summit21-talk/main/examples/handlers-1.ts
+```https://raw.githubusercontent.com/zepatrik/ory-summit21-talk/main/examples/handlers-1.ts
   // assuming this can only be set by ingress/upstream service/...
   const username = req.headers.authorization
   if (!username) {
@@ -179,13 +204,18 @@ Integration into the POST handler:
   await addOwnershipRelation(filePath, username)
 ```
 
-Authorization header contains the username - this is just for the purpose of this example! in a real world application you would use a JWT that are set or created in an upstream service (for example Ory Oathkeeper).
-So here we get the username and then add the ownership relation between the file and the username.
-The idea here is that whenever we create a file, we create this relation in Ory Keto and then later we can request whether a relation exists for permission checks. 
+Authorization header contains the username - this is just for the purpose of
+this example! in a real world application you would use a JWT that are set or
+created in an upstream service (for example Ory Oathkeeper). So here we get the
+username and then add the ownership relation between the file and the username.
+The idea here is that whenever we create a file, we create this relation in Ory
+Keto and then later we can request whether a relation exists for permission
+checks.
 
 ### Check relations
 
-Lets implement a helper function that allows us to do a check whether a user is an owner of a file:
+Lets implement a helper function that allows us to do a check whether a user is
+an owner of a file:
 
 ```
 show diff to 1
@@ -224,26 +254,34 @@ const checkIsOwner = (filePath: string, username: string) => {
 
 ```
 
-This is the reverse of what we just did: it's looking up whether in the namespace `files` the user is the owner of the file - just as defined in the step before.
-In case the user is the owner we serve the file, if not there is an error: "You are not the owner of the file".
+This is the reverse of what we just did: it's looking up whether in the
+namespace `files` the user is the owner of the file - just as defined in the
+step before. In case the user is the owner we serve the file, if not there is an
+error: "You are not the owner of the file".
 
-Lets test our full setup now.
-Launch the client again (localhost:9000 + press c for the overlay)
-put in username: example Bob, filename "example.txt", content "dont show anyone"
-click POST and you shoudl get success
-now lets check if we get access. 
+Lets test our full setup now. Launch the client again (localhost:9000 + press c
+for the overlay) put in username: example Bob, filename "example.txt", content
+"dont show anyone" click POST and you shoudl get success now lets check if we
+get access.
 
 (show screenshot)
 
 Now we leave out the username and see if we can get access again.
 
-One problem with this approach is that we now check directly for ownership. 
-You might want to share the file with someone else and you're the owner of the file so you're allowed to share it. Someone else might read it, but they might not be allowed to update it or share it further - or any other combination of those.
-In our setup this is not solely reflected by the ownership relation. With this case we limit the flexibility to actually implement the permissions on top of this ownership relation. 
+One problem with this approach is that we now check directly for ownership. You
+might want to share the file with someone else and you're the owner of the file
+so you're allowed to share it. Someone else might read it, but they might not be
+allowed to update it or share it further - or any other combination of those. In
+our setup this is not solely reflected by the ownership relation. With this case
+we limit the flexibility to actually implement the permissions on top of this
+ownership relation.
 
-What we should do instead is track the relations as they are, but then actually define the permissions based on the relations. 
+What we should do instead is track the relations as they are, but then actually
+define the permissions based on the relations.
 
-Instead of checking whether someone is an owner (`checkIsOwner`) we check for the "read" relation (`checkCanRead`) - this is a new relation that we just introduced:
+Instead of checking whether someone is an owner (`checkIsOwner`) we check for
+the "read" relation (`checkCanRead`) - this is a new relation that we just
+introduced:
 
 ```diff
 + const checkCanRead = (filePath: string, username: string) => {
@@ -253,14 +291,25 @@ Instead of checking whether someone is an owner (`checkIsOwner`) we check for th
 + checkRequest.setRelation('read')
 ```
 
-This read relation can be defined in a lot of different ways. One very common pattern is that when you can write to a file you usually also can read it.
-Another one might be that you get a shared link that allows you to read a file. But you are not the owner of the file and you are not able to edit it. 
-That's why this abstraction is important if you are building more complex authorization. 
+This read relation can be defined in a lot of different ways. One very common
+pattern is that when you can write to a file you usually also can read it.
+Another one might be that you get a shared link that allows you to read a file.
+But you are not the owner of the file and you are not able to edit it. That's
+why this abstraction is important if you are building more complex
+authorization.
 
-We also need to create a second tuple and you might notice that this is called "workaround tuple". That's because you currently have to implement a workaround for "subject set rewrites" in Ory Keto. - But it's considered a workaround because we are currently working on subject set rewrites. They will allow to do this without adding tuples. Using subject set rewrites we can define without effort that everyone whose owner also has read access.
-The workaround tuple says that you can read the file, the subject set, and if you are owner of the file. 
-In this workaround tuple the username does not appear but we define read through ownership - giving everyone who has ownership of a file the `read` permissionl
-This gives us flexibility later on, so we will be able to remove that permission, adjust it. We can implement the `write`/`read` relation in the same way.
+We also need to create a second tuple and you might notice that this is called
+"workaround tuple". That's because you currently have to implement a workaround
+for "subject set rewrites" in Ory Keto. - But it's considered a workaround
+because we are currently working on subject set rewrites. They will allow to do
+this without adding tuples. Using subject set rewrites we can define without
+effort that everyone whose owner also has read access. The workaround tuple says
+that you can read the file, the subject set, and if you are owner of the file.
+In this workaround tuple the username does not appear but we define read through
+ownership - giving everyone who has ownership of a file the `read` permissionl
+This gives us flexibility later on, so we will be able to remove that
+permission, adjust it. We can implement the `write`/`read` relation in the same
+way.
 
-Check out the full code example on GitHub and the Ory Keto documentation for the next steps.
-
+Check out the full code example on GitHub and the Ory Keto documentation for the
+next steps.
