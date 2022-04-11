@@ -30,6 +30,8 @@ tags:
   - Architecture
 ---
 
+import CodeFromRemote from '../../components/freestanding/utils/codefromremote'
+
 This article is based on the "Design Complex Authorization with Ory Keto" talk
 by [zepatrik](https://github.com/zepatrik/). You can watch the full talk here:
 
@@ -38,49 +40,53 @@ https://www.youtube.com/watch?v=lGRMYkQrNb0
 ## Introduction
 
 Ory Keto is a service that you can use to implement authorization in any
-application. Authorization means it can answers the questions "Is this user
-allowed to do this?". Ory Keto is inspired by the paper that Google wrote about
-their access control system called Zanzibar and draws a lot of the theoretical
-background from the implementation that Google chose. In
+application.  
+Authorization means an answer to the the question "Is this user allowed to do
+this?".  
+Ory Keto is inspired by the paper that Google wrote about their access control
+system called [Zanzibar](https://research.google/pubs/pub48190/) and draws a lot
+from the theoretical background of the implementation that Google chose. In
 [my last post](https://www.ory.sh/keto-zanzibar-evolution/) I wrote about the
-theoretical background of the
-[Zanzibar paper](https://research.google/pubs/pub48190/) and the challenges that
-a global access control system with billions of users has to solve. In this post
-I will give a high-level overview on how Keto works and then jump into some
-concrete examples.
+theoretical background of Zanzibar and the challenges come with a global access
+control system with billions of users. In this post I will give a high-level
+overview on how Keto works and then demonstrate some concrete examples.
 
 So what does it mean that Ory Keto is based on the Zanzibar paper? The core
-principle is that of a graph of relations, and bear with me to learn why this is
-the core of Ory Keto performance.
+principle is that of a graph of relations, and in the next section we learn more
+about the basic principles that Ory Keto uses:
 
-## Ory Keto basic principles
+## Ory Keto - The basics
 
 The basic data structure is relation tuples. There are two types of relation
 tuples:
 
-- "object0#access@user0" This relation tuple describes a relation between an
-  object and a subject. This is very generic because objects, relations and
-  subjects are just strings. Ory Keto can now give you all the connections
-  between relations for this relation tuple.
+- `object0#access@user0`
 
-- "object1#access@(object0#acccess)" This relation tuple is very similar to the
-  one above, but includes subject sets - in plain English this means that
-  everyone who has access to object0 - this part is the subject set - also has
-  access to object1). Subject sets are a way to define indirect relations based
-  on other relations.
+  - This relation tuple describes a relation between an object and a subject.
+    This is very generic because objects, relations and subjects are just
+    strings. Ory Keto can now give you all the connections between relations for
+    this relation tuple.
 
-With these types of relation tuples we can now define permissions.
+- `object1#access@(object0#acccess)`
+  - This relation tuple is very similar to the one above, but includes subject
+    sets - in plain English this means that everyone who has access to object0 -
+    this part is the subject set - also has access to object1). Subject sets are
+    a way to define indirect relations based on other relations.
+
+With relation tuples we can now define a graph of relations:
 
 ### Graph of relations
 
-The relation tuples we define result in a graph of relations. This graph is just
-a very standard directed graph and we can apply standard graph algorithms to it.
-One such algorithm would be to do a permission check. In practice that is done
-by solving a
+The relation tuples we define result in a graph of relations. This graph is a
+very standard directed graph and we can apply standard graph algorithms to it.
+This means we can use an algorithm to do a permission check. In practice that is
+done by solving a
 [reachability problem](https://en.wikipedia.org/wiki/Reachability_problem) on
-the graph. If an object is reachable through a specific relation from a subject
-it's considered that this is a true request. So the Check API will allow the
-request to go through and if there is no connection then it will stay false.  
+the graph.  
+If an object is reachable through a specific relation from a subject it's
+considered that this is a true request. In that case, the Ory Keto Check API
+will allow the request to go through, and if there is no connection it will
+block the request.  
 You can also build representations of this graph of relations and do audits on
 it, and so have a very fine grained control over who can access what.
 
@@ -92,103 +98,174 @@ never have the same ID. They can also be later on used for some extra relational
 features, so for example instead of adding a relation namespaces can be used to
 exclude from a relation.
 
-## Lets hack
+## Let's hack
 
-gh repo clone zepatrik/ory-summit21-talk cd ory-summit21-talk npm i npm start
+To get started clone the repository, install all needed npm packages and start
+the NodeJS server:
+
+```
+gh repo clone vinckr/keto-example
+cd keto-example
+npm i
+npm start
+```
 
 Our example starts a basic NodeJS server:
 
-```
-https://raw.githubusercontent.com/zepatrik/ory-summit21-talk/main/examples/server.ts
-```
+<CodeFromRemote
+  lang="js"
+  src="https://raw.githubusercontent.com/vinckr/keto-example/main/examples/server.ts"
+/>
 
-The server listen to the port set, some course headers, and here handleGet and
-handlePost. A simple cloud storage, key is the filename, and value is the
-content.
+The server listens to the port 7000, adds CORS headers, and handles the requests
+`handleGet` and `handlePost`. We are building a simple cloud storage, where
+`key` is the filename, and `value` is the content. In this example a client is
+included.
 
-In this presentation we have a built-in client - so we can launch that client as
-well. Navigate to http://localhost:9000/ and press `c` to launch the client
-overlay. ignore the username field for now.
+Let's create our first relation tuple!  
+Navigate to [localhost:9000](http://localhost:9000/) to launch the client
+interface.  
+Add `example.txt` in the filename field and `foo` in the file content field and
+press POST to send it to our backend, ignore the username field for now. If
+everything works you will get this output:
 
-add example.txt in the filename and foo in the contents and press POST You will
-get this output
-
-```
+```js
 fetch('http://localhost:7000/example.txt', {
-      method: 'POST',
-      headers: {
-        authorization: ''
-      },
-      body: content
-    })
+  method: 'POST',
+  headers: {
+    authorization: ''
+  },
+  body: content
+})
 ```
 
-POST writes the file so it reads the body and writes to the file. The client
-also has a handleGet fuction which reads a file and serves it, if possible.
-handleGet returns an error if it can't find it, can't open it for whatever
-reason.
+Our client uses the `handlePost` function to create a filme (`example.txt`) and
+reads `File Content` as body. The client also has a `handleGet` function which
+reads a file and serves it, if possible. handleGet returns an error if it can't
+find or open the file.
 
 See the full code for this basic client:
 
-```
-https://raw.githubusercontent.com/zepatrik/ory-summit21-talk/main/examples/handlers-0.ts
-```
+<CodeFromRemote
+  lang="js"
+  src="https://raw.githubusercontent.com/vinckr/keto-example/main/examples/handlers-0.ts"
+/>
 
 ### Create relations
 
-We want to track the ownership of these files now. We want to then later add
-permissions so the owners can read, can modify, can update a file and can change
-the sharing permissions and more. To achieve this we add the following to our
+We now want to track the ownership of these files. Also we want to later add
+permissions so the owners can read, modify, update, and change the sharing
+permissions for a file and more. To achieve this we add the following to our
 handler:
 
-```
-https://raw.githubusercontent.com/zepatrik/ory-summit21-talk/main/examples/handlers-1.ts
-(add diff here) (or break down below)
-```
+```diff
+import fs from 'fs/promises'
+import { IncomingMessage, ServerResponse } from 'http'
 
-Some imports and helper function This is the code to create relation tuples:
++ import * as grpc from '@grpc/grpc-js'
++ import {
++   acl,
++   write,
++   writeService
++ } from '@ory/keto-grpc-client/ory/keto/acl/v1alpha1'
 
-```jsx https://raw.githubusercontent.com/zepatrik/ory-summit21-talk/main/examples/handlers-1.ts
-const addOwnershipRelation = (filePath: string, username: string) => {
-  const relationTuple = new acl.RelationTuple()
-  relationTuple.setNamespace('files')
-  relationTuple.setObject(filePath)
-  relationTuple.setRelation('owner')
-
-  const sub = new acl.Subject()
-  sub.setId(username)
-  relationTuple.setSubject(sub)
-
-  const tupleDelta = new write.RelationTupleDelta()
-  tupleDelta.setAction(write.RelationTupleDelta.Action.INSERT)
-  tupleDelta.setRelationTuple(relationTuple)
-
-  const writeRequest = new write.TransactRelationTuplesRequest()
-  writeRequest.addRelationTupleDeltas(tupleDelta)
-
-  return new Promise<void>((resolve, reject) => {
-    writeClient.transactRelationTuples(writeRequest, (error) => {
-      if (error) {
-        reject(error)
-      } else {
-        resolve()
-      }
+export const handleGet = async (
+  req: IncomingMessage,
+  res: ServerResponse,
+  filePath: string
+) => {
+  return fs
+    .readFile(filePath)
+    .then((data) => {
+      res.setHeader('Content-type', 'text/plain')
+      res.end(data)
     })
-  })
+    .catch((err) => {
+      res.statusCode = 500
+      res.end(`File ${req.url} cannot be served: ${err}`)
+    })
 }
+
++ const writeClient = new writeService.WriteServiceClient(
++   '127.0.0.1:4467',
++   grpc.credentials.createInsecure()
++ )
+
++ const addOwnershipRelation = (filePath: string, username: string) => {
++   const relationTuple = new acl.RelationTuple()
++   relationTuple.setNamespace('files')
++   relationTuple.setObject(filePath)
++   relationTuple.setRelation('owner')
+
++   const sub = new acl.Subject()
++   sub.setId(username)
++   relationTuple.setSubject(sub)
+
++   const tupleDelta = new write.RelationTupleDelta()
++   tupleDelta.setAction(write.RelationTupleDelta.Action.INSERT)
++   tupleDelta.setRelationTuple(relationTuple)
+
++   const writeRequest = new write.TransactRelationTuplesRequest()
++   writeRequest.addRelationTupleDeltas(tupleDelta)
+
++   return new Promise<void>((resolve, reject) => {
++     writeClient.transactRelationTuples(writeRequest, (error) => {
++       if (error) {
++         reject(error)
++       } else {
++         resolve()
++       }
++     })
++   })
++ }
+
+export const handlePost = async (
+  req: IncomingMessage,
+  res: ServerResponse,
+  filePath: string
+) => {
++  // assuming this can only be set by ingress/upstream service/...
++  const username = req.headers.authorization
++  if (!username) {
++    res.statusCode = 403
++    res.end('Only for authenticated users.')
++    return
++  }
++
++  await addOwnershipRelation(filePath, username)
++
+  return fs
+    .open(filePath, 'w', 0o600)
+    .then(async (file) => {
+      let body = ''
+      for await (const chunk of req) {
+        if (chunk instanceof Buffer) {
+          body += chunk.toString('utf-8')
+        }
+      }
+
+      return file
+        .write(body)
+        .then(() => {
+          res.statusCode = 201
+          res.setHeader('Location', req.url)
+          res.end('Success')
+        })
+        .finally(file.close)
+    })
+    .catch((err) => {
+      res.statusCode = 500
+      res.end(`File ${req.url} cannot be written: ${err}`)
+    })
+}
+
 ```
 
-Now we use the `files` namespaces and we set the path of the file as the object.
-There is also an owner relationship `relationTuple.setRelation('owner')` and as
-the subject we set the username
-
-```https://raw.githubusercontent.com/zepatrik/ory-summit21-talk/main/examples/handlers-1.ts
-  const sub = new acl.Subject()
-  sub.setId(username)
-  relationTuple.setSubject(sub)
-```
-
-And then we do an API call `writeRequest` to Ory Keto to store this relation.
+Now in the `addOwnershipRelation` function our client uses the `files`
+namespaces and sets the path of the file as the object. It also creates an owner
+relationship `relationTuple.setRelation('owner')` and set the username as
+subject. Finally it does an API call `writeRequest` to Ory Keto to store the
+newly created relation.
 
 Integration into the POST handler:
 
