@@ -218,7 +218,20 @@ export const handleGet = async (
 +     })
 +   })
 + }
+```
 
+In the `addOwnershipRelation` function the client gets the username and then
+adds an ownership relation between the file and the username. Our client uses
+the `files` namespaces and sets the path of the file as the object. It also
+creates an owner relationship `relationTuple.setRelation('owner')` and sets the
+username as subject. Finally calls the `writeRequest` API to Ory Keto to
+store the newly created relation. The idea is that whenever we create a file, we
+create this relation in Ory Keto and then later we can request whether a
+relation exists for permission checks.
+
+Integration into `handlePost`:
+
+```diff
 export const handlePost = async (
   req: IncomingMessage,
   res: ServerResponse,
@@ -258,77 +271,85 @@ export const handlePost = async (
       res.end(`File ${req.url} cannot be written: ${err}`)
     })
 }
-
 ```
 
-Now in the `addOwnershipRelation` function our client uses the `files`
-namespaces and sets the path of the file as the object. It also creates an owner
-relationship `relationTuple.setRelation('owner')` and set the username as
-subject. Finally it does an API call `writeRequest` to Ory Keto to store the
-newly created relation.
-
-Integration into the POST handler:
-
-```https://raw.githubusercontent.com/zepatrik/ory-summit21-talk/main/examples/handlers-1.ts
-  // assuming this can only be set by ingress/upstream service/...
-  const username = req.headers.authorization
-  if (!username) {
-    res.statusCode = 403
-    res.end('Only for authenticated users.')
-    return
-  }
-
-  await addOwnershipRelation(filePath, username)
-```
-
-Authorization header contains the username - this is just for the purpose of
-this example! in a real world application you would use a JWT that are set or
-created in an upstream service (for example Ory Oathkeeper). So here we get the
-username and then add the ownership relation between the file and the username.
-The idea here is that whenever we create a file, we create this relation in Ory
-Keto and then later we can request whether a relation exists for permission
-checks.
+The authorization header contains the username just for the purpose of this
+example! In a real world application you would use for example a JSON Web Token
+(JWT) that is set or created in an upstream service (for example
+[Ory Oathkeeper](https://github.com/ory/oathkeeper)).
 
 ### Check relations
 
-Lets implement a helper function that allows us to do a check whether a user is
-an owner of a file:
+To check relations we add a helper function to our handler that allows us to do a check whether a user is
+the owner of a file:
 
-```
-show diff to 1
-https://raw.githubusercontent.com/zepatrik/ory-summit21-talk/main/examples/handlers-2.ts
-
-,
-  check,
-  checkService
+```diff
+...
+import {
+  acl,
+  write,
++  writeService,
++  check,
++  checkService
 } from '@ory/keto-grpc-client/ory/keto/acl/v1alpha1'
 
-const checkClient = new checkService.CheckServiceClient(
-  '127.0.0.1:4466',
-  grpc.credentials.createInsecure()
-)
++ const checkClient = new checkService.CheckServiceClient(
++   '127.0.0.1:4466',
++   grpc.credentials.createInsecure()
++ )
 
-const checkIsOwner = (filePath: string, username: string) => {
-  const checkRequest = new check.CheckRequest()
-  checkRequest.setNamespace('files')
-  checkRequest.setObject(filePath)
-  checkRequest.setRelation('owner')
++ const checkIsOwner = (filePath: string, username: string) => {
++   const checkRequest = new check.CheckRequest()
++   checkRequest.setNamespace('files')
++   checkRequest.setObject(filePath)
++   checkRequest.setRelation('owner')
 
-  const sub = new acl.Subject()
-  sub.setId(username)
-  checkRequest.setSubject(sub)
++   const sub = new acl.Subject()
++   sub.setId(username)
++   checkRequest.setSubject(sub)
 
-  return new Promise<boolean>((resolve, reject) => {
-    checkClient.check(checkRequest, (error, resp) => {
-      if (error) {
-        reject(error)
-      } else {
-        resolve(resp.getAllowed())
-      }
++   return new Promise<boolean>((resolve, reject) => {
++     checkClient.check(checkRequest, (error, resp) => {
++       if (error) {
++         reject(error)
++       } else {
++         resolve(resp.getAllowed())
++       }
++     })
++   })
++ }
++
+export const handleGet = async (
+  req: IncomingMessage,
+  res: ServerResponse,
+  filePath: string
+) => {
++  // assuming this can only be set by ingress/upstream service/...
++  const username = req.headers.authorization
++  if (!username) {
++    res.statusCode = 403
++    res.end('Only for authenticated users.')
++    return
++  }
++
++  if (!(await checkIsOwner(filePath, username))) {
++    res.statusCode = 403
++    res.end('You are not the owner of the file')
++    return
++  }
++
+  return fs
+    .readFile(filePath)
+    .then((data) => {
+      res.setHeader('Content-type', 'text/plain')
+      res.end(data)
     })
-  })
+    .catch((err) => {
+      res.statusCode = 500
+      res.end(`File ${req.url} cannot be served: ${err}`)
+    })
 }
-
+...
 ```
 
 This is the reverse of what we just did: it's looking up whether in the
