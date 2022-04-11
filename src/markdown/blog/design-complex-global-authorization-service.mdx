@@ -224,8 +224,8 @@ In the `addOwnershipRelation` function the client gets the username and then
 adds an ownership relation between the file and the username. Our client uses
 the `files` namespaces and sets the path of the file as the object. It also
 creates an owner relationship `relationTuple.setRelation('owner')` and sets the
-username as subject. Finally calls the `writeRequest` API to Ory Keto to
-store the newly created relation. The idea is that whenever we create a file, we
+username as subject. Finally calls the `writeRequest` API to Ory Keto to store
+the newly created relation. The idea is that whenever we create a file, we
 create this relation in Ory Keto and then later we can request whether a
 relation exists for permission checks.
 
@@ -280,8 +280,8 @@ example! In a real world application you would use for example a JSON Web Token
 
 ### Check relations
 
-To check relations we add a helper function to our handler that allows us to do a check whether a user is
-the owner of a file:
+To check relations we add a helper function to our handler that allows us to do
+a check whether a user is the owner of a file:
 
 ```diff
 ...
@@ -352,62 +352,128 @@ export const handleGet = async (
 ...
 ```
 
-This is the reverse of what we just did: it's looking up whether in the
-namespace `files` the user is the owner of the file - just as defined in the
-step before. In case the user is the owner we serve the file, if not there is an
-error: "You are not the owner of the file".
+This is the reverse of what we just before when adding the ownership relation.
+`checkIsOwner` is looking up if the user is the owner of the file in the
+namespace `files` - as defined in the step before. In case the user is the owner
+we serve the file, if not there is an error: "You are not the owner of the
+file".
 
-Lets test our full setup now. Launch the client again (localhost:9000 + press c
-for the overlay) put in username: example Bob, filename "example.txt", content
-"dont show anyone" click POST and you shoudl get success now lets check if we
-get access.
+We have now implemented functions to track, modify and check ownership of files
+and are ready to test the full setup now. Launch the client again
+([localhost:9000](http://localhost:9000/)) and add the following (feel free to
+use different names)
 
-(show screenshot)
+- Username: Bob
+- Filename example.txt
+- File Content: bobs-darkest-secrets
 
-Now we leave out the username and see if we can get access again.
+Click `POST` and you should get the following result:
 
-One problem with this approach is that we now check directly for ownership. You
+```
+fetch('http://localhost:7000/example.txt', {
+      method: 'POST',
+      headers: {
+        authorization: 'Bob'
+      },
+      body: content
+    })
+```
+
+Now add `example.txt` as the file name and press `GET` to access the file.
+
+One problem with this approach is that we check directly for ownership. You
 might want to share the file with someone else and you're the owner of the file
-so you're allowed to share it. Someone else might read it, but they might not be
-allowed to update it or share it further - or any other combination of those. In
-our setup this is not solely reflected by the ownership relation. With this case
-we limit the flexibility to actually implement the permissions on top of this
-ownership relation.
+so you're allowed to share it. Someone else might be able read it, but they
+might not be allowed to update or share it further. In our setup this is not
+solely reflected by the ownership relation. In this case we limit the
+flexibility to implement permissions on top of this ownership relation.
 
 What we should do instead is track the relations as they are, but then actually
-define the permissions based on the relations.
+define the permissions based on relations.
 
 Instead of checking whether someone is an owner (`checkIsOwner`) we check for
 the "read" relation (`checkCanRead`) - this is a new relation that we just
 introduced:
 
 ```diff
+- const checkIsOwner = (filePath: string, username: string) => {
 + const checkCanRead = (filePath: string, username: string) => {
   const checkRequest = new check.CheckRequest()
   checkRequest.setNamespace('files')
   checkRequest.setObject(filePath)
+-  checkRequest.setRelation('owner')
 + checkRequest.setRelation('read')
+
+...
+
+-  if (!(await checkIsOwner(filePath, username))) {
++  if (!(await checkCanRead(filePath, username))) {
+    res.statusCode = 403
+-    res.end('You are not the owner of the file')
++    res.end('You are not allowed to read the file')
+    return
+  }
+
+...
 ```
 
-This read relation can be defined in a lot of different ways. One very common
-pattern is that when you can write to a file you usually also can read it.
-Another one might be that you get a shared link that allows you to read a file.
-But you are not the owner of the file and you are not able to edit it. That's
-why this abstraction is important if you are building more complex
-authorization.
+This read relation can be defined in a lot of different ways. For example when
+you can write to a file you normally also can read it. Another pattern might be
+that you get a shared link that allows you to read a file. But you are not the
+owner of the file and you are not able to edit it. That's why this abstraction
+is important if you are building more complex authorization.
 
-We also need to create a second tuple and you might notice that this is called
-"workaround tuple". That's because you currently have to implement a workaround
-for "subject set rewrites" in Ory Keto. - But it's considered a workaround
-because we are currently working on subject set rewrites. They will allow to do
-this without adding tuples. Using subject set rewrites we can define without
-effort that everyone whose owner also has read access. The workaround tuple says
-that you can read the file, the subject set, and if you are owner of the file.
-In this workaround tuple the username does not appear but we define read through
-ownership - giving everyone who has ownership of a file the `read` permissionl
-This gives us flexibility later on, so we will be able to remove that
-permission, adjust it. We can implement the `write`/`read` relation in the same
-way.
+We also need to create a second tuple called "workaround tuple". That's because
+you currently have to implement a workaround for "subject set rewrites" in Ory
+Keto. It's considered a workaround because we are currently working on
+[subject set rewrites](https://github.com/ory/keto/issues/263). Using subject
+set rewrites we can define that everyone who is owner also has read access
+without effort. In the meantime we can use the workaround tuple which says that
+you can read the file, the subject set, and if you are owner of the file. In
+this workaround tuple the username does not appear but we define read through
+ownership - giving everyone who has ownership of a file the `read` permission.
+This gives us flexibility later on, so we will be able to remove that permission
+or adjust it. We can implement the `write`/ read` relation in the same way.
 
-Check out the full code example on GitHub and the Ory Keto documentation for the
-next steps.
+```diff
+...
+
+...
+  const sub = new acl.Subject()
+  sub.setId(username)
+  relationTuple.setSubject(sub)
+
++  const workaroundTuple = new acl.RelationTuple()
++  workaroundTuple.setNamespace('files')
++  workaroundTuple.setObject(filePath)
++  workaroundTuple.setRelation('read')
++
++  const workaroundSubjectSet = new acl.SubjectSet()
++  workaroundSubjectSet.setNamespace('files')
++  workaroundSubjectSet.setObject(filePath)
++  workaroundSubjectSet.setRelation('owner')
++
++  const workaroundSubject = new acl.Subject()
++  workaroundSubject.setSet(workaroundSubjectSet)
++  workaroundTuple.setSubject(workaroundSubject)
++
++  const writeRequest = new write.TransactRelationTuplesRequest()
+
++  ;[relationTuple, workaroundTuple].forEach((tuple) => {
+    const tupleDelta = new write.RelationTupleDelta()
+    tupleDelta.setAction(write.RelationTupleDelta.Action.INSERT)
+-    tupleDelta.setRelationTuple(relationTuple)
++    tupleDelta.setRelationTuple(tuple)
+
+-  const writeRequest = new write.TransactRelationTuplesRequest()
+    writeRequest.addRelationTupleDeltas(tupleDelta)
++  })
+
+...
+```
+
+These are the basic building blocks to design a complex authorization service with Ory Keto. Check out the
+[full code example on GitHub](https://github.com/vinckr/keto-example) and the
+[Ory Keto documentation](https://www.ory.sh/docs/keto) for more information.
+
+>[Share what you created](https://github.com/ory/keto/discussions/new?category=show-and-tell) on the basis this tutorial with the Ory community.
