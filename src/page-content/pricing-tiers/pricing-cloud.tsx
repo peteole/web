@@ -44,6 +44,14 @@ export const pricingCloud: Pick<PricingProps, 'cloud'> = {
         },
         {
           icon: Check,
+          title: 'Social Sign-in'
+        },
+        {
+          icon: Check,
+          title: 'Passwordless'
+        },
+        {
+          icon: Check,
           title: 'Custom Identity Models'
         },
         {

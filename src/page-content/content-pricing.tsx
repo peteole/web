@@ -84,12 +84,12 @@ export const featurelist: FeaturelistProps = {
           icon: PlusCircle
         },
         {
-          title: <>Social Logins</>,
+          title: <>OAuth 2.0 Server</>,
           description: (
             <>
-              Simplify your users' experience and let them use their existing
-              accounts at Google, GitHub, Apple etc. to sign up and log in. All
-              OIDC providers are supported.
+              Become an identity provider, serve OAuth2.0 requests, secure your
+              API, implement federation, and much more. Use Ory's advanced open
+              source OAuth 2.0 service in Ory Cloud.
             </>
           ),
           icon: PlusCircle
@@ -132,6 +132,17 @@ export const featurelist: FeaturelistProps = {
             <>
               The basics of IAM: Login and register users fast and without
               complicated flows and store credentials securely.
+            </>
+          ),
+          icon: CheckCircle
+        },
+        {
+          title: <>Social Logins</>,
+          description: (
+            <>
+              Simplify your users' experience and let them use their existing account credentials from
+              providers like Google, GitHub, Apple etc. to sign up and log in.
+              Custom OIDC providers are supported as well.
             </>
           ),
           icon: CheckCircle

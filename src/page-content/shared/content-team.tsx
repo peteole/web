@@ -30,7 +30,7 @@ export const team: TeamProps = {
   team: [
     {
       name: 'Aeneas Rekkas',
-      position: 'Engineering',
+      position: 'Engineering, Co-founder',
       social: [
         {
           network: SocialNetworks.github,
@@ -55,7 +55,7 @@ export const team: TeamProps = {
     },
     {
       name: 'Thomas Aidan Curran',
-      position: 'Product',
+      position: 'Product, Co-Founder',
       social: [
         {
           network: SocialNetworks.github,
@@ -255,52 +255,6 @@ export const team: TeamProps = {
       )
     },
     {
-      name: 'Lee Atchison',
-      position: 'Architecture',
-      social: [
-        {
-          network: SocialNetworks.web,
-          href: 'https://leeatchison.com/'
-        },
-        {
-          network: SocialNetworks.linkedin,
-          href: 'https://www.linkedin.com/in/leeatchison'
-        }
-      ],
-      img: (
-        <StaticImage
-          placeholder="blurred"
-          layout="constrained"
-          aspectRatio={1}
-          loading="lazy"
-          className="responsive"
-          alt="Lee Atchison"
-          src="../../images/team/lee.png"
-        />
-      )
-    },
-    {
-      name: 'Marney Kline',
-      position: 'Digital Marketing',
-      social: [
-        {
-          network: SocialNetworks.github,
-          href: 'https://github.com/marneysof'
-        }
-      ],
-      img: (
-        <StaticImage
-          placeholder="blurred"
-          layout="constrained"
-          aspectRatio={1}
-          loading="lazy"
-          className="responsive"
-          alt="Marney Kline"
-          src="../../images/team/marney.png"
-        />
-      )
-    },
-    {
       name: 'Tobias Sahl',
       position: 'Digital Marketing',
       social: [
@@ -331,7 +285,7 @@ export const team: TeamProps = {
       social: [
         {
           network: SocialNetworks.github,
-          href: 'https://github.com/MicLeey'
+          href: 'https://github.com/micleyman'
         }
       ],
       img: (
@@ -341,8 +295,221 @@ export const team: TeamProps = {
           aspectRatio={1}
           loading="lazy"
           className="responsive"
-          alt="Michael Leey"
+          alt="Michael Leyman"
           src="../../images/team/michael.png"
+        />
+      )
+    },
+    {
+      name: 'Rinor Gashi',
+      position: 'Digital Marketing',
+      social: [
+        {
+          network: SocialNetworks.github,
+          href: 'https://github.com/RinorG'
+        },
+        {
+          network: SocialNetworks.linkedin,
+          href: 'https://www.linkedin.com/in/rinor-gashi-1aab781bb/'
+        }
+      ],
+      img: (
+        <StaticImage
+          placeholder="blurred"
+          layout="constrained"
+          aspectRatio={1}
+          loading="lazy"
+          className="responsive"
+          alt="Rinor Gashi"
+          src="../../images/team/rinor.png"
+        />
+      )
+    },
+    {
+      name: 'Anirudh Oppiliappan',
+      position: 'Engineering',
+      social: [
+        {
+          network: SocialNetworks.github,
+          href: 'https://github.com/icyphox'
+        },
+        {
+          network: SocialNetworks.web,
+          href: 'https://icyphox.sh'
+        }
+      ],
+      img: (
+        <StaticImage
+          placeholder="blurred"
+          layout="constrained"
+          aspectRatio={1}
+          loading="lazy"
+          className="responsive"
+          alt="Anirudh Oppiliappan"
+          src="../../images/team/anirudh.png"
+        />
+      )
+    },
+    {
+      name: 'Leonie Habermann',
+      position: 'Operations',
+      social: [
+        {
+          network: SocialNetworks.github,
+          href: 'https://github.com/haberml'
+        },
+        {
+          network: SocialNetworks.linkedin,
+          href: 'https://www.linkedin.com/in/leonie-habermann-261551b8/'
+        }
+      ],
+      img: (
+        <StaticImage
+          placeholder="blurred"
+          layout="constrained"
+          aspectRatio={1}
+          loading="lazy"
+          className="responsive"
+          alt="Leonie Habermann"
+          src="../../images/team/leonie.png"
+        />
+      )
+    },
+    {
+      name: 'Rebecca Gong',
+      position: 'Finance',
+      social: [
+        {
+          network: SocialNetworks.github,
+          href: 'https://github.com/RebeccaGong'
+        },
+        {
+          network: SocialNetworks.linkedin,
+          href: 'https://linkedin.com/in/rebecca-qian-g-24b86b16'
+        }
+      ],
+      img: (
+        <StaticImage
+          placeholder="blurred"
+          layout="constrained"
+          aspectRatio={1}
+          loading="lazy"
+          className="responsive"
+          alt="Rebecca Gong"
+          src="../../images/team/rebecca.png"
+        />
+      )
+    },
+    {
+      name: 'Andrew Minkin',
+      position: 'Developer Relations',
+      social: [
+        {
+          network: SocialNetworks.github,
+          href: 'https://github.com/gen1us2k'
+        }
+      ],
+      img: (
+        <StaticImage
+          placeholder="blurred"
+          layout="constrained"
+          aspectRatio={1}
+          loading="lazy"
+          className="responsive"
+          alt="Andrew Minkin"
+          src="../../images/team/andrew.png"
+        />
+      )
+    },
+    {
+      name: 'Marwin Härttrich',
+      position: 'Digital Marketing',
+      social: [
+        {
+          network: SocialNetworks.github,
+          href: 'https://github.com/marwinhaerttrich'
+        }
+      ],
+      img: (
+        <StaticImage
+          placeholder="blurred"
+          layout="constrained"
+          aspectRatio={1}
+          loading="lazy"
+          className="responsive"
+          alt="Marwin Härttrich"
+          src="../../images/team/marwin.png"
+        />
+      )
+    },
+    {
+      name: 'Adam Wałach',
+      position: 'Engineering',
+      social: [
+        {
+          network: SocialNetworks.github,
+          href: 'https://github.com/adamwalach'
+        },
+        {
+          network: SocialNetworks.linkedin,
+          href: 'https://www.linkedin.com/in/adamwalach/'
+        }
+      ],
+      img: (
+        <StaticImage
+          placeholder="blurred"
+          layout="constrained"
+          aspectRatio={1}
+          loading="lazy"
+          className="responsive"
+          alt="Adam Wałach"
+          src="../../images/team/adam.png"
+        />
+      )
+    },
+    {
+      name: 'Ferdynand Naczynski',
+      position: 'Engineering',
+      social: [
+        {
+          network: SocialNetworks.github,
+          href: 'https://github.com/nipsufn'
+        }
+      ],
+      img: (
+        <StaticImage
+          placeholder="blurred"
+          layout="constrained"
+          aspectRatio={1}
+          loading="lazy"
+          className="responsive"
+          alt="Ferdynand Naczynski"
+          src="../../images/team/ferdynand.png"
+        />
+      )
+    },
+    {
+      name: 'Tomasz Papiernik',
+      position: 'Technical Writing',
+      social: [
+        {
+          network: SocialNetworks.github,
+          href: 'https://github.com/tomekpapiernik'
+        },
+        {
+          network: SocialNetworks.linkedin,
+          href: 'https://www.linkedin.com/in/tomekpapiernik/'
+        }
+      ],
+      img: (
+        <StaticImage
+          placeholder="blurred"
+          layout="constrained"
+          aspectRatio={1}
+          loading="lazy"
+          className="responsive"
+          alt="Tomasz Papiernik"
+          src="../../images/team/tomasz.png"
         />
       )
     }

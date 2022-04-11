@@ -5,7 +5,7 @@
       "mainMenu": [
         {
           "title": "Ory Cloud",
-          "description": "Start Free, No Credit Card required",
+          "description": "Start Free",
           "to": "/cloud"
         },
         {
@@ -29,7 +29,7 @@
           "to": "/open-source"
         },
         {
-          "title": "Identity & User Management",
+          "title": "Identity Management",
           "description": "Ory Kratos",
           "to": "/kratos"
         },
@@ -39,7 +39,7 @@
           "to": "/hydra"
         },
         {
-          "title": "Global Authorization Server",
+          "title": "Global Authorization Service",
           "description": "Ory Keto",
           "to": "/keto"
         },
@@ -49,7 +49,7 @@
           "to": "/oathkeeper"
         },
         {
-          "title": "Community Driven Development",
+          "title": "Community",
           "description": "GitHub",
           "to": "https://github.com/ory",
           "openInNewWindow": true
@@ -70,13 +70,13 @@
           "to": "/community"
         },
         {
-          "title": "Articles & Guides",
+          "title": "Blog Articles",
           "description": "Ory Developer Blog",
           "to": "/blog"
         },
         {
           "title": "NextJS",
-          "description": "Painless Authentication for React",
+          "description": "Authentication for React",
           "to": "/nextjs"
         },
         {

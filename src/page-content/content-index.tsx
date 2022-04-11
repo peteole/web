@@ -41,7 +41,7 @@ export const hero: HeroProps = {
     {
       ctaTitle: 'Start with Ory Cloud',
       style: 'filled',
-      to: '/cloud'
+      to: 'https://console.ory.sh/registration'
     }
   ]
 }
@@ -63,7 +63,7 @@ export const featureContentCloud: FeatureContentProps = {
     </>
   ),
   button: {
-    ctaTitle: 'Test now',
+    ctaTitle: 'Get Started',
     to: 'https://console.ory.sh/registration',
     iconRight: ArrowRight
   },
