@@ -156,7 +156,7 @@ export const pricingCloud: Pick<PricingProps, 'cloud'> = {
       priceIsMonetary: false,
       button: {
         title: 'Contact us',
-        to: 'https://meetings-eu1.hubspot.com/tobias-sahl',
+        to: 'https://meetings-eu1.hubspot.com/stephan-reinartz',
         style: 'outlined'
       },
       features: [
