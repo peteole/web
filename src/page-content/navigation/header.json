@@ -96,10 +96,6 @@
         {
           "title": "Contact Us",
           "to": "mailto:office@ory.sh"
-        },
-        {
-          "title": "Identity Report",
-          "to": "/identity-in-modern-applications-oreilly"
         }
       ]
     },
