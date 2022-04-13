@@ -72,10 +72,10 @@ So the login is as follows:
 
 1. Request a login flow
 2. Kratos returns login flow ID
-3. Send login to kratos, referencing the flow ID
+3. Send login to Ory Kratos, referencing the flow ID
 4. Kratos returns session cookie
 5. Request protected field from GQL api, attaching session cookie
-6. GQL API asks kratos to verify session cookie
+6. GQL API asks Ory Kratos to verify session cookie
 7. Kratos returns user ID belonging to session cookie
 8. GQL API returns protected field
 
@@ -83,20 +83,20 @@ So the login is as follows:
 
 Sometimes, Kratos and the user interface need another concept to interact. Let's
 say you forgot your password and requested a recovery link via mail. The problem
-kratos developers needed to solve here is to send some _token_ from the recovery
-link back to kratos (to verify the email) and at the same time associate it with
+Ory Kratos developers needed to solve here is to send some _token_ from the recovery
+link back to Ory Kratos (to verify the email) and at the same time associate it with
 a session of the UI in a web browser so that the user can reset their password
 in the UI, and all with minimal knowledge of the specific app architecture.
 
-They solved this by hosting kratos on the same domain as the app itself and
+They solved this by hosting Ory Kratos on the same domain as the app itself and
 using _redirects_. For instance our UI is hosted under
-https://huddle.hsg.fs.tum.de/ui whereas kratos is hosted under
+https://huddle.hsg.fs.tum.de/ui whereas Ory Kratos is hosted under
 https://huddle.hsg.fs.tum.de/.ory/kratos. The messages exchanged are as follows:
 
 1. User clicks recovery link in the format
    https://huddle.hsg.fs.tum.de/.ory/kratos/self-service/recovery?flow=6b817dhf-4717-48we-a756-cd7902b43ce6&token=QiGjssJcvB08H7cUdE3tyXvQr1i4OSaR.
    Note that this will result in a GET request by the browser that will be
-   handled by kratos totally independent from the UI!
+   handled by Ory Kratos totally independent from the UI!
 2. Kratos verifies the query parameters and responds with a redirect to a
    preconfigured URL such as https://huddle.hsg.fs.tum.de/ui/profile. A session
    cookie is set as well so that future requests by the user can be
@@ -106,13 +106,13 @@ https://huddle.hsg.fs.tum.de/.ory/kratos. The messages exchanged are as follows:
 
 # Deployment and secret management
 
-Let's first go through the deployment of ory kratos itself, which we do in
+Let's first go through the deployment of Ory Kratos itself, which we do in
 [kubernetes](https://kubernetes.io/) with [helm](https://helm.sh/) and
 [helmfile](https://github.com/roboll/helmfile).
 
 Kratos has a [helm chart](https://k8s.ory.sh/helm/kratos.html) that allows to
-install kratos in a cluster more or less conveniently. The interesting thing is
-how to configure kratos (set redirect links, email-credentials etc.). We to it
+install Ory Kratos in a cluster more or less conveniently. The interesting thing is
+how to configure Ory Kratos (set redirect links, email-credentials etc.). We to it
 by providing values to the helm chart in our helmfile. All this is managed in
 our [deployment repo](https://gitlab.lrz.de/projecthub/deployment):
 
@@ -129,7 +129,7 @@ our [deployment repo](https://gitlab.lrz.de/projecthub/deployment):
 ...
 ```
 
-The entrypoint for the kratos deployment is `helmfile.yaml`:
+The entrypoint for the Ory Kratos deployment is `helmfile.yaml`:
 
 ```yaml
 repositories:
@@ -191,7 +191,7 @@ secret:
 
 This config consists of two parts:
 
-1. The `kratos.config` subfields follow the schema for configuring kratos
+1. The `kratos.config` subfields follow the schema for configuring Ory Kratos
    independent from kubernetes, as described
    [here](https://www.ory.sh/docs/kratos/reference/configuration). As you can
    see we set various fields such as the email address to use for account
@@ -200,7 +200,7 @@ This config consists of two parts:
    in base 64 encoding.
 2. The `secret` subfields are used for a kubernetes-specific way to provide
    credentials since we don't want to save them in plain text. We state that
-   kratos should use a secret called `secret-kratos` to get credentials rather
+   Ory Kratos should use a secret called `secret-kratos` to get credentials rather
    than try to take them from the plain text config. This allows us to create
    the secret in another, encrypted repo (meaning only encrypted versions of the
    secrets are tracked with git). The `secret-kratos`-secret has to be in the
@@ -222,9 +222,9 @@ stringData:
 
 (of course I replaced the credentials by hitting the keyboard as wild :smiley:)
 
-Now running `helmfile sync` will deploy kratos to our cluster!
+Now running `helmfile sync` will deploy Ory Kratos to our cluster!
 
-Finally we need to publicly expose kratos using an ingress controller in
+Finally we need to publicly expose Ory Kratos using an ingress controller in
 kubernetes:
 
 ```yaml
@@ -258,13 +258,13 @@ spec:
 
 However two things feel a bit hacky about the deployment:
 
-1. Even though we correctly set the base URL in the kratos config, we need to do
-   [regex magic to rewrite the path as if kratos was hosted under the root path](https://kubernetes.github.io/ingress-nginx/user-guide/ingress-path-matching/).
-2. I was unable to find a way to put the kratos config in its own file (which
+1. Even though we correctly set the base URL in the Ory Kratos config, we need to do
+   [regex magic to rewrite the path as if Ory Kratos was hosted under the root path](https://kubernetes.github.io/ingress-nginx/user-guide/ingress-path-matching/).
+2. I was unable to find a way to put the Ory Kratos config in its own file (which
    would for instance enable intellisense in VSCode) and include that file as a
    subfield of the `kratos.config` field of the helm config
-3. Running `helmfile sync` after altering some kratos preferences does NOT
-   deploy these changes to the cluster. You need to delete the kratos deployment
+3. Running `helmfile sync` after altering some Ory Kratos preferences does NOT
+   deploy these changes to the cluster. You need to delete the Ory Kratos deployment
    and then run the sync comment.
 
 Do you have any tips on how to solve this?
@@ -279,7 +279,7 @@ By default it's hidden. Whenever a login requests drops in (since a user clicked
 an item that needs authorization), the component pops up and asks the user to
 fill in their credentials, register or reset their password. When the
 credentials are entered, the corresponding flow is started using the
-[kratos js sdk](https://www.ory.sh/docs/kratos/sdk).
+[Ory Kratos JS SDK](https://www.ory.sh/docs/kratos/sdk).
 
 ```tsx
 import React, { useEffect, useState } from 'react';
@@ -561,15 +561,15 @@ Now imagine a user wants to access a protected field of our api (see
 for a post about our API architecture) and the backend needs to decide somehow
 who the requester is in order to know if they have the permission to access the
 field. On a high level, the backend must extract the session cookie from the
-request and ask kratos who that cookie belongs to. This is done by injecting
+request and ask Ory Kratos who that cookie belongs to. This is done by injecting
 some code at the root of our server with the
-[kratos go sdk](https://www.ory.sh/docs/kratos/sdk). The go specific part of the
-sdk is not documented at all as far as I know so we had to fiddle around with it
+[Ory Kratos Go SDK](https://www.ory.sh/docs/kratos/sdk). The go specific part of the
+SDK is not documented at all as far as I know so we had to fiddle around with it
 until it worked.
 
 For every request,we attach the user ID of the requester to the context. But to
 find out the user ID, we extract the session cookie from the request and check
-it against kratos with the `ToSession` function. Note that we
+it against Ory Kratos with the `ToSession` function. Note that we
 [only set the cookie for that request and not some header](https://github.com/ory/kratos/discussions/2053#discussioncomment-1798113)!
 
 ```go
