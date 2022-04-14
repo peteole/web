@@ -140,9 +140,10 @@ export const featurelist: FeaturelistProps = {
           title: <>Social Logins</>,
           description: (
             <>
-              Simplify your users' experience and let them use their existing account credentials from
-              providers like Google, GitHub, Apple etc. to sign up and log in.
-              Custom OIDC providers are supported as well.
+              Simplify your users' experience and let them use their existing
+              account credentials from providers like Google, GitHub, Apple etc.
+              to sign up and log in. Custom OIDC providers are supported as
+              well.
             </>
           ),
           icon: CheckCircle

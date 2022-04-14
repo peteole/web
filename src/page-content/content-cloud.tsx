@@ -31,13 +31,15 @@ export const hero_alt: HeroImageProps = {
   id: 'cloud.hero',
   title: (
     <>
-      <span className={'is-themed-primary'}> Ory Cloud </span> uses industry standards
+      <span className={'is-themed-primary'}> Ory Cloud </span> uses industry
+      standards
     </>
   ),
   description: (
     <>
-      Ory Cloud is API-first, customizable, privacy conform and secure and deploys all Ory services in concert - at any scale, across the globe.
-      <span className={'is-themed-primary'}>  </span>
+      Ory Cloud is API-first, customizable, privacy conform and secure and
+      deploys all Ory services in concert - at any scale, across the globe.
+      <span className={'is-themed-primary'}> </span>
     </>
   ),
   buttons: [
