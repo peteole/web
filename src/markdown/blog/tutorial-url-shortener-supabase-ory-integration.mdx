@@ -142,7 +142,7 @@ _Okay. Let's start hacking, shall we?_
   lang="golang"
 />
 
-## Defining database schema.
+## Defining database schema
 
 The database for our URL shortener should have the following tables:
 
@@ -276,6 +276,15 @@ folder in the repository, but this basic configuration is based on the
 Quickstart guide.
 
 ### Authentication middleware
+We configured Ory Oathkeeper to act as identity and access proxy,
+and our configuration does two things:
+
+- Check authentication and who the current session belongs by calling the [`sessions/whoami`](https://www.ory.sh/docs/kratos/reference/api#operation/toSession) endpoint of Ory Kratos.
+- Get the identity.id from the previous step and modify the request by adding a `X-User` header with the user's identity id.
+
+It means that we do not need to take any additional steps for our Go
+application, and we can get the value from `X-User`
+header and use it in our application.
 
 <CodeFromRemote
   src="https://github.com/gen1us2k/shorts/blob/master/middleware/middleware.go"
