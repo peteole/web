@@ -3,15 +3,14 @@ import React from 'react'
 export const About = () => (
   <>
     <p>
-      We believe that today's "digital identity" is fundamentally flawed. There
-      are too many profiles, registration screens, passwords, privacy
-      violations, data leaks, phishing attacks, and data mining operations out
-      there. Our vision is to make the internet more secure and private with
-      better software, open-source, and open knowledge. Ory is the largest
-      open-source authentication and authorization (login, registration, MFA,
-      permissions, OAuth2,...) ecosystem and community in the world. We develop
-      open-source software and use it to build a scalable, easy-to-use, and
-      secure cloud platform.
+      With more than 20,000 members, Ory is the leading open-source
+      authentication identity management, account registration, login and
+      authorization ecosystem and community in the world. Ory’s flagship zero
+      trust network “Ory Cloud” is a global, scalable and secure platform for
+      managing identities and its distribution across various internet services
+      including IoT and emerging Fintech systems. Ory is a modern software
+      start-up founded in 2019 that promotes an open, diverse, and
+      collaborative working culture.
     </p>
   </>
 )
