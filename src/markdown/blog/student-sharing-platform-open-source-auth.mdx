@@ -42,7 +42,7 @@ and
 [how we consume it in a typesafe way](https://dev.to/peteole/how-we-built-a-student-project-platform-using-graphql-react-golang-ory-kratos-and-kubernetes-part-1-19jg)
 as well!
 
-# High-level architecture
+## High-level architecture
 
 We have three software components that are involved in the authentication
 process:
@@ -71,35 +71,37 @@ future.
 So the login is as follows:
 
 1. Request a login flow
-2. Kratos returns login flow ID
-3. Send login to Ory Kratos, referencing the flow ID
-4. Kratos returns session cookie
-5. Request protected field from GQL api, attaching session cookie
-6. GQL API asks Ory Kratos to verify session cookie
-7. Kratos returns user ID belonging to session cookie
-8. GQL API returns protected field
+1. Kratos returns login flow ID
+1. Send login to Ory Kratos, referencing the flow ID
+1. Kratos returns session cookie
+1. Request protected field from GQL api, attaching session cookie
+1. GQL API asks Ory Kratos to verify session cookie
+1. Kratos returns user ID belonging to session cookie
+1. GQL API returns protected field
 
 ## Redirects / Account recovery
 
 Sometimes, Kratos and the user interface need another concept to interact. Let's
 say you forgot your password and requested a recovery link via mail. The problem
-Ory Kratos developers needed to solve here is to send some _token_ from the recovery
-link back to Ory Kratos (to verify the email) and at the same time associate it with
-a session of the UI in a web browser so that the user can reset their password
-in the UI, and all with minimal knowledge of the specific app architecture.
+Ory Kratos developers needed to solve here is to send some _token_ from the
+recovery link back to Ory Kratos (to verify the email) and at the same time
+associate it with a session of the UI in a web browser so that the user can
+reset their password in the UI, and all with minimal knowledge of the specific
+app architecture.
 
 They solved this by hosting Ory Kratos on the same domain as the app itself and
 using _redirects_. For instance our UI is hosted under
-https://huddle.hsg.fs.tum.de/ui whereas Ory Kratos is hosted under
-https://huddle.hsg.fs.tum.de/.ory/kratos. The messages exchanged are as follows:
+`https://huddle.hsg.fs.tum.de/ui` whereas Ory Kratos is hosted under
+`https://huddle.hsg.fs.tum.de/.ory/kratos`. The messages exchanged are as
+follows:
 
 1. User clicks recovery link in the format
-   https://huddle.hsg.fs.tum.de/.ory/kratos/self-service/recovery?flow=6b817dhf-4717-48we-a756-cd7902b43ce6&token=QiGjssJcvB08H7cUdE3tyXvQr1i4OSaR.
+   `https://huddle.hsg.fs.tum.de/.ory/kratos/self-service/recovery?flow=6b817dhf-4717-48we-a756-cd7902b43ce6&token=QiGjssJcvB08H7cUdE3tyXvQr1i4OSaR`.
    Note that this will result in a GET request by the browser that will be
    handled by Ory Kratos totally independent from the UI!
 2. Kratos verifies the query parameters and responds with a redirect to a
-   preconfigured URL such as https://huddle.hsg.fs.tum.de/ui/profile. A session
-   cookie is set as well so that future requests by the user can be
+   pre-configured URL such as `https://huddle.hsg.fs.tum.de/ui/profile`. A
+   session cookie is set as well so that future requests by the user can be
    authenticated
 3. After the redirect, the web application UI takes over. For instance the user
    can set a new password on the profile site.
@@ -107,14 +109,14 @@ https://huddle.hsg.fs.tum.de/.ory/kratos. The messages exchanged are as follows:
 # Deployment and secret management
 
 Let's first go through the deployment of Ory Kratos itself, which we do in
-[kubernetes](https://kubernetes.io/) with [helm](https://helm.sh/) and
-[helmfile](https://github.com/roboll/helmfile).
+[Kubernetes](https://kubernetes.io/) with [helm](https://helm.sh/) and
+[Helmfile](https://github.com/roboll/helmfile).
 
-Kratos has a [helm chart](https://k8s.ory.sh/helm/kratos.html) that allows to
-install Ory Kratos in a cluster more or less conveniently. The interesting thing is
-how to configure Ory Kratos (set redirect links, email-credentials etc.). We to it
-by providing values to the helm chart in our helmfile. All this is managed in
-our [deployment repo](https://gitlab.lrz.de/projecthub/deployment):
+Kratos has a [Helm Chart](https://k8s.ory.sh/helm/kratos.html) that allows to
+install Ory Kratos in a cluster more or less conveniently. The interesting thing
+is how to configure Ory Kratos (set redirect links, email-credentials etc.). We
+to it by providing values to the helm chart in our Helmfile. All this is managed
+in our [deployment repo](https://gitlab.lrz.de/projecthub/deployment):
 
 ```txt
 ├── cert.yaml
@@ -199,8 +201,8 @@ This config consists of two parts:
    [identity schema to use for storing account data](https://www.ory.sh/docs/kratos/concepts/identity-schema)
    in base 64 encoding.
 2. The `secret` subfields are used for a kubernetes-specific way to provide
-   credentials since we don't want to save them in plain text. We state that
-   Ory Kratos should use a secret called `secret-kratos` to get credentials rather
+   credentials since we don't want to save them in plain text. We state that Ory
+   Kratos should use a secret called `secret-kratos` to get credentials rather
    than try to take them from the plain text config. This allows us to create
    the secret in another, encrypted repo (meaning only encrypted versions of the
    secrets are tracked with git). The `secret-kratos`-secret has to be in the
@@ -258,14 +260,15 @@ spec:
 
 However two things feel a bit hacky about the deployment:
 
-1. Even though we correctly set the base URL in the Ory Kratos config, we need to do
+1. Even though we correctly set the base URL in the Ory Kratos config, we need
+   to do
    [regex magic to rewrite the path as if Ory Kratos was hosted under the root path](https://kubernetes.github.io/ingress-nginx/user-guide/ingress-path-matching/).
-2. I was unable to find a way to put the Ory Kratos config in its own file (which
-   would for instance enable intellisense in VSCode) and include that file as a
-   subfield of the `kratos.config` field of the helm config
+2. I was unable to find a way to put the Ory Kratos config in its own file
+   (which would for instance enable intellisense in VSCode) and include that
+   file as a subfield of the `kratos.config` field of the helm config
 3. Running `helmfile sync` after altering some Ory Kratos preferences does NOT
-   deploy these changes to the cluster. You need to delete the Ory Kratos deployment
-   and then run the sync comment.
+   deploy these changes to the cluster. You need to delete the Ory Kratos
+   deployment and then run the sync comment.
 
 Do you have any tips on how to solve this?
 
@@ -563,9 +566,9 @@ who the requester is in order to know if they have the permission to access the
 field. On a high level, the backend must extract the session cookie from the
 request and ask Ory Kratos who that cookie belongs to. This is done by injecting
 some code at the root of our server with the
-[Ory Kratos Go SDK](https://www.ory.sh/docs/kratos/sdk). The go specific part of the
-SDK is not documented at all as far as I know so we had to fiddle around with it
-until it worked.
+[Ory Kratos Go SDK](https://www.ory.sh/docs/kratos/sdk). The go specific part of
+the SDK is not documented at all as far as I know so we had to fiddle around
+with it until it worked.
 
 For every request,we attach the user ID of the requester to the context. But to
 find out the user ID, we extract the session cookie from the request and check
@@ -576,63 +579,63 @@ it against Ory Kratos with the `ToSession` function. Note that we
 package main
 
 import (
-	"context"
-	"fmt"
-	"log"
-	"net/http"
-	"os"
+  "context"
+  "fmt"
+  "log"
+  "net/http"
+  "os"
 
-	"github.com/99designs/gqlgen/graphql"
-	"github.com/99designs/gqlgen/graphql/handler"
-	"github.com/99designs/gqlgen/graphql/playground"
-	kc "github.com/ory/kratos-client-go"
-	"github.com/rs/cors"
-	"gitlab.lrz.de/projecthub/gql-api/auth"
-	"gitlab.lrz.de/projecthub/gql-api/graph/generated"
-	"gitlab.lrz.de/projecthub/gql-api/graph/resolvers"
+  "github.com/99designs/gqlgen/graphql"
+  "github.com/99designs/gqlgen/graphql/handler"
+  "github.com/99designs/gqlgen/graphql/playground"
+  kc "github.com/ory/kratos-client-go"
+  "github.com/rs/cors"
+  "gitlab.lrz.de/projecthub/gql-api/auth"
+  "gitlab.lrz.de/projecthub/gql-api/graph/generated"
+  "gitlab.lrz.de/projecthub/gql-api/graph/resolvers"
 )
 
 const port = "8080"
 
 func main() {
-	kratosConfig := kc.NewConfiguration()
-	kratosConfig.Host = "kratos-public"
-	kratosConfig.Scheme = "http"
-	api := kc.NewAPIClient(kratosConfig)
-	resolver, _ := resolvers.NewResolver(os.ExpandEnv(os.Getenv("DB_CONNECTION_STRING")))
+  kratosConfig := kc.NewConfiguration()
+  kratosConfig.Host = "kratos-public"
+  kratosConfig.Scheme = "http"
+  api := kc.NewAPIClient(kratosConfig)
+  resolver, _ := resolvers.NewResolver(os.ExpandEnv(os.Getenv("DB_CONNECTION_STRING")))
 
-	config := generated.Config{Resolvers: resolver}
-	config.Directives.IsLoggedIn = func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error) {
-		if _, loginErr := auth.IdentityFromContext(ctx); loginErr == nil {
-			return next(ctx)
-		} else {
-			return nil, fmt.Errorf("authenticate please")
-		}
-	}
-	srv := handler.NewDefaultServer(generated.NewExecutableSchema(config))
+  config := generated.Config{Resolvers: resolver}
+  config.Directives.IsLoggedIn = func(ctx context.Context, obj interface{}, next graphql.Resolver) (res interface{}, err error) {
+    if _, loginErr := auth.IdentityFromContext(ctx); loginErr == nil {
+      return next(ctx)
+    } else {
+      return nil, fmt.Errorf("authenticate please")
+    }
+  }
+  srv := handler.NewDefaultServer(generated.NewExecutableSchema(config))
 
-	http.Handle("/api", playground.Handler("GraphQL playground", "/api/query"))
-	corsHandler := cors.New(cors.Options{AllowedOrigins: []string{"http://localhost:3000","https://huddle-groups.readme.io"}, AllowCredentials: true, OptionsPassthrough: true, AllowedHeaders: []string{"*"}}).Handler(srv)
-	http.HandleFunc("/api/query", func(rw http.ResponseWriter, r *http.Request) {
-		cookie, err := r.Cookie("ory_kratos_session")
-		if err != nil {
-			corsHandler.ServeHTTP(rw, r)
-			return
-		}
-		toSessionReq := api.V0alpha2Api.ToSession(context.Background()).Cookie(cookie.String())
-		session, _, err := toSessionReq.Execute()
-		if err != nil {
-			corsHandler.ServeHTTP(rw, r)
-			return
-		}
+  http.Handle("/api", playground.Handler("GraphQL playground", "/api/query"))
+  corsHandler := cors.New(cors.Options{AllowedOrigins: []string{"http://localhost:3000","https://huddle-groups.readme.io"}, AllowCredentials: true, OptionsPassthrough: true, AllowedHeaders: []string{"*"}}).Handler(srv)
+  http.HandleFunc("/api/query", func(rw http.ResponseWriter, r *http.Request) {
+    cookie, err := r.Cookie("ory_kratos_session")
+    if err != nil {
+      corsHandler.ServeHTTP(rw, r)
+      return
+    }
+    toSessionReq := api.V0alpha2Api.ToSession(context.Background()).Cookie(cookie.String())
+    session, _, err := toSessionReq.Execute()
+    if err != nil {
+      corsHandler.ServeHTTP(rw, r)
+      return
+    }
 
-		newContext := auth.NewIdentityContext(r.Context(), &session.Identity)
-		newRequest := r.WithContext(newContext)
-		corsHandler.ServeHTTP(rw, newRequest)
-	})
+    newContext := auth.NewIdentityContext(r.Context(), &session.Identity)
+    newRequest := r.WithContext(newContext)
+    corsHandler.ServeHTTP(rw, newRequest)
+  })
 
-	log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
-	log.Fatal(http.ListenAndServe(":"+port, nil))
+  log.Printf("connect to http://localhost:%s/ for GraphQL playground", port)
+  log.Fatal(http.ListenAndServe(":"+port, nil))
 }
 ```
 
@@ -648,37 +651,37 @@ We wrapped the code to write or read the identity to/from the context in the
 package auth
 
 import (
-	"context"
-	"fmt"
+  "context"
+  "fmt"
 
-	kc "github.com/ory/kratos-client-go"
+  kc "github.com/ory/kratos-client-go"
 )
 
 type Identity struct {
-	kc.Identity
-	traits map[string]interface{}
+  kc.Identity
+  traits map[string]interface{}
 }
 type customKey int
 
 var identityKey customKey
 
 func NewIdentityContext(ctx context.Context, identity *kc.Identity) context.Context {
-	return context.WithValue(ctx, identityKey, identity)
+  return context.WithValue(ctx, identityKey, identity)
 }
 func IdentityFromContext(ctx context.Context) (*Identity, error) {
-	identity, ok := ctx.Value(identityKey).(*kc.Identity)
-	if ok {
-		traits, ok := identity.Traits.(map[string]interface{})
-		if ok {
-			return &Identity{Identity: *identity, traits: traits}, nil
-		}
-	}
-	return nil, fmt.Errorf("no identity found in context")
+  identity, ok := ctx.Value(identityKey).(*kc.Identity)
+  if ok {
+    traits, ok := identity.Traits.(map[string]interface{})
+    if ok {
+      return &Identity{Identity: *identity, traits: traits}, nil
+    }
+  }
+  return nil, fmt.Errorf("no identity found in context")
 }
 
 func (i *Identity) GetTrait(key string) (string, bool) {
-	val, ok := i.traits[key].(string)
-	return val, ok
+  val, ok := i.traits[key].(string)
+  return val, ok
 }
 ```
 
@@ -690,12 +693,12 @@ In a resolver, we can access the identity like this:
 
 ```go
 func (r *mutationResolver) SetMyDescription(ctx context.Context, description string) (bool, error) {
-	me, err := auth.IdentityFromContext(ctx)
-	if err != nil {
-		return false, err
-	}
-	err = r.queries.SetDescription(context.Background(), sqlc.SetDescriptionParams{Description: description, ID: uuid.MustParse(me.Id)})
-	return err == nil, err
+  me, err := auth.IdentityFromContext(ctx)
+  if err != nil {
+    return false, err
+  }
+  err = r.queries.SetDescription(context.Background(), sqlc.SetDescriptionParams{Description: description, ID: uuid.MustParse(me.Id)})
+  return err == nil, err
 }
 ```
 
