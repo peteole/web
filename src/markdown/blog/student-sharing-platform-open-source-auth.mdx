@@ -106,7 +106,7 @@ follows:
 3. After the redirect, the web application UI takes over. For instance the user
    can set a new password on the profile site.
 
-# Deployment and secret management
+## Deployment and secret management
 
 Let's first go through the deployment of Ory Kratos itself, which we do in
 [Kubernetes](https://kubernetes.io/) with [helm](https://helm.sh/) and
@@ -272,7 +272,7 @@ However two things feel a bit hacky about the deployment:
 
 Do you have any tips on how to solve this?
 
-# The login UI
+## The login UI
 
 Now let's jump right into the code! We handle login requests with a popup
 component that looks like this:
@@ -284,7 +284,7 @@ fill in their credentials, register or reset their password. When the
 credentials are entered, the corresponding flow is started using the
 [Ory Kratos JS SDK](https://www.ory.sh/docs/kratos/sdk).
 
-```tsx
+```tsx<fr
 import React, { useEffect, useState } from 'react';
 import type { Identity, UiContainer, V0alpha2Api } from '@ory/kratos-client'
 let _api: V0alpha2Api | undefined
@@ -465,87 +465,79 @@ this by a clever configuration of the Apollo client with
 [Links](https://www.apollographql.com/docs/react/api/link/introduction/):
 
 ```ts
-import {
-  HttpLink,
-  ApolloClient,
-  InMemoryCache,
-  ApolloLink,
-  Observable
-} from '@apollo/client'
-import { offsetLimitPagination } from '@apollo/client/utilities'
-import PushStream from 'zen-push'
-import { AuthenticationRequest } from './authentication/authenticationObserbale'
-import { clientConfig } from './config'
-import { StrictTypedTypePolicies } from './schemas'
+import { HttpLink, ApolloClient, InMemoryCache, ApolloLink, Observable } from "@apollo/client";
+import { offsetLimitPagination } from "@apollo/client/utilities";
+import PushStream from "zen-push"
+import { AuthenticationRequest } from "./authentication/authenticationObserbale";
+import {clientConfig}  from "./config";
+import { StrictTypedTypePolicies } from "./schemas";
+
 const endpointLink = new HttpLink({
-  uri: clientConfig.gqlUrl,
-  credentials: 'include'
-})
-scribe to this to display the authentication popup when needing authentication
-expor
-export const authenticationStream = new PushStream<AuthenticationRequest>()
+    uri: clientConfig.gqlUrl,
+    credentials: "include"
+});
+// Subscribe to this to display the authentication popup when needing authentication
+export const authenticationStream = new PushStream<AuthenticationRequest>();
 const LoginLink = new ApolloLink((operation, forward) => {
-  const observable = endpointLink.request(operation)
-  let waitingForLogin = false
-  return new Observable((observer) => {
-    scribe to http link and handle authentication errors seperately
-    const subs = observable!.subscribe({
-      next: (data) => {
-        if (data.errors?.[0]?.message.includes('authenticate')) {
-          waitingForLogin = true
-           for login
-          authenticationStream.next({
-            onFailed: () => {
-              observer.next(data)
-              waitingForLogin = false
+    const observable = endpointLink.request(operation);
+    let waitingForLogin = false
+    return new Observable((observer) => {
+        // subscribe to http link and handle authentication errors seperately
+        const subs = observable!.subscribe({
+            next: (data) => {
+                if (data.errors?.[0]?.message.includes("authenticate")) {
+                    waitingForLogin = true
+                    // Ask for login
+                    authenticationStream.next({
+                        onFailed: () => {
+                            observer.next(data)
+                            waitingForLogin = false
+                        },
+                        onFinished: () => {
+                            // retry fetching data after authentication
+                            subs.unsubscribe()
+                            endpointLink.request(operation)?.subscribe({
+                                next: data => observer.next(data),
+                                complete: () => observer.complete(),
+                                error: (err) => observer.error(err)
+                            })
+                        }
+                    })
+                } else {
+                    // forward data
+                    observer.next(data);
+                }
             },
-            onFinished: () => {
-              ry fetching data after authentication
-              subs.unsubscribe()
-              endpointLink
-                .request(operation)
-                ?.subscribe({
-                  next: (data) => observer.next(data),
-                  complete: () => observer.complete(),
-                  error: (err) => observer.error(err)
-                })
+            error: (error) => {
+                observer.error(error);
             }
-          })
-        } else {
-          ward data
-          observer.next(data)
+            ,
+            complete: () => {
+                if (!waitingForLogin) {
+                    observer.complete();
+                }
+            }
+        });
+    });
+});
+const typePolicies: StrictTypedTypePolicies={
+    Project:{
+        keyFields:["id"],
+        merge(existing, incoming) {
+            return { ...existing, ...incoming };
         }
-      },
-      error: (error) => {
-        observer.error(error)
-      },
-      complete: () => {
-        if (!waitingForLogin) {
-          observer.complete()
+    },
+    Query:{
+        fields:{
+            searchProjects:offsetLimitPagination(["options","searchString"])
         }
-      }
-    })
-  })
-})
-const typePolicies: StrictTypedTypePolicies = {
-  Project: {
-    keyFields: ['id'],
-    merge(existing, incoming) {
-      return { ...existing, ...incoming }
     }
-  },
-  Query: {
-    fields: {
-      searchProjects: offsetLimitPagination(['options', 'searchString'])
-    }
-  }
 }
 export const client = new ApolloClient({
-  : 'https://huddle.ridilla.eu/api/query',
-    c
-  cache: new InMemoryCache({ typePolicies }),
-  link: LoginLink
-})
+    // uri: 'https://huddle.ridilla.eu/api/query',
+    cache: new InMemoryCache({typePolicies}),
+    link: LoginLink
+});
 ```
 
 We hook into the http requests sent to our API and whenever an error contains
@@ -557,7 +549,7 @@ The nice thing is that in the rest of the UI, we have no other point, where we
 need to care about authentication! Just make your GraphQL request and
 authentication will be handled by the client!
 
-# Verifying users in the API backend
+## Verifying users in the API backend
 
 Now imagine a user wants to access a protected field of our api (see
 [here](https://dev.to/peteole/how-we-built-a-student-project-platform-using-graphql-react-golang-ory-kratos-and-kubernetes-part-1-19jg)
