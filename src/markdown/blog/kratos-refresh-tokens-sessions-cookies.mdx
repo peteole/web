@@ -1,0 +1,78 @@
+---
+path: '/kratos-refresh-tokens-sessions-cookies/'
+
+title: |
+  Why there are no Refresh Tokens in Ory Kratos
+
+teaser: |
+  Some teaser
+
+seo:
+  title: |
+    seo title
+  description: |
+    seo description
+  keywords: |
+    login, auth, authentication, registration, reactjs, vercel, nextjs, react, spa, single page app,
+    open source, ory, ory kratos, jwt, cookies, pass-by-reference, pass-by-value
+
+publishedAt: '2022-05-04'
+author: vinckr
+
+overline: |
+  Refresh Tokens
+tags:
+  - Guide
+  - Authentication
+  - Ory Cloud
+  - Open Source
+  - Serverless
+  - User Management
+---
+
+We often get questions on why Refresh Tokens are not used in Ory Kratos or requests to add this mechanism to Ory Kratos.
+This post aims to explain what Refresh Tokens are useful for and why they are not needed in Ory Kratos.
+Lets  talk about the difference between flows using access and Refresh Tokens and flows using Session Cookies ( and Session Tokens). Ory Kratos is using the latter, so all self-service flows are based on the concept of sessions and there are no Refresh Tokens involved.
+
+## Why Refresh Tokens
+
+To explain why we do not need Refresh Tokens in Ory Kratos it is best to look at two different models and explain the difference between access / Refresh Tokens, session cookies and tokens.
+
+[Access Tokens](https://datatracker.ietf.org/doc/html/rfc6749#section-1.4) are a concept from OAuth 2.0. Access Tokens are __pass-by-value__ and  have the format of a Json Web Tokens (JWT). In our case __pass-by-value__ means the application gets an Access Token from the [OAuth 2.0 server](https://www.ory.sh/hydra/) and can validate it itself to give the end-user an active session without calling another API. This makes invalidating the Access Token tricky, because we need a list of tokens that are no longer valid. We need to check this list of invalidated Access Tokens on every request to check if the User Session is still valid.
+To solve this problem [Refresh Tokens](https://datatracker.ietf.org/doc/html/rfc6749#section-1.5) have been introduced. The reason we have the concept of Refresh Tokens in OAuth 2.0 is to provide a mechanism to invalidate sessions and thus log out the end-user. When the Refresh Token is no longer valid, because it was invalidated in the backend, the Access Token will eventually expire. Usually Access Tokens are very short-lived, that means when the Refresh Token is invalid the User Session is invalidated and the end-user logged out - when the Access Token expiry is reached.
+
+## Sessions in Ory Kratos
+
+[Session Cookies](https://en.wikipedia.org/wiki/HTTP_cookie) are something (hopefully) every reader is familiar with Session Cookies represent a User Session and are usually as valid as long as the User Session is valid. User Sessions can also be stored in the format of a JWT, then we call them Session Tokens. In Ory Kratos, these Session Tokens and Session Cookies are __pass-by-reference__. Bear with me, I will explain in a moment why that is important here.
+By definition __pass-by-reference__ means we do a lookup of the reference every time we use it. In our case we do a lookup of the token every time we validate it. This is great, because we can easily invalidate the User Session. Once we invalidate the Session Token in the backend, access would be denied immediately on the next request - unless you have a cache somewhere. This means Instant Logout is built into Ory Kratos by design, just invalidate the session in Ory Kratos and the user is logged out instantly.
+So all that Refresh Tokens are doing, we already can do in Ory Kratos - meaning invalidating access credentials.
+
+The concept of Refresh Tokens also introduces additional complexity and the OAuth 2.0 specification also leaves a lot of room for interpretation:
+
+1. How long should Refresh Tokens be valid for?
+2. What happens if Refresh Tokens are re-used? There are two options:
+   1. We invalidate all Access Tokens and Refresh Tokens. This will eventually lead token reuse issues where you accidentally refresh the token twice, leading to access being revoked even if it shouldn't have been revoked.
+   2. Do not invalidate anything. This is equal to just having a long living Access Token.
+
+So, what does the user gain from this? Not much, really:
+
+1. If the Refresh Token or Access Token are compromised the attacker can use them for as long as they are valid.
+2. If the Refresh Token is re-used, and the token chain is invalidated, the user would probably never know that their account was compromised because it might have been a network flake or code bug.
+
+All of these reasons speak against implementing a refresh functionality for sessions, because the added security is negligible. Instead, we need to rely on other security mechanisms:
+
+- Strict TLS enforcement with certificate pinning for HTTPS connections
+- Storing credentials in the OS credentials chain
+
+There are possibilities to detect credential theft, that will be implemented in a future version of [Ory Cloud](https://www.ory.sh/cloud/): 
+
+- Is the credential being used from another IP, geolocation, or user agent? If so, is it reasonable or a risk?
+- Is the credential suddenly behaving different? If so, is it reasonable or a risk?
+
+Based on these questions one can guess if a credential was stolen and misused, or has regular use. This will actually detect, and potentially prevent, credential theft.
+Applying Refresh Tokens to this problem doesn't bring any of these benefits. The only benefit would be that the attacker does not have long-term-access to the credential, but the account is already compromised anyways.
+
+Refresh Tokens are something that solve a very particular problem (invalidating __pass-by-value__ credentials), and are not generalizable over other measures such as credential theft. Refresh Tokens will not make an application more secure by design. 
+
+- [Read more about use cases that require concepts like Refresh Tokens and OAuth 2.0 in general in this blog post.](https://www.ory.sh/oauth2-openid-connect-do-you-need-use-cases-examples/)
+- [Read this before implementing OAuth 2.0, it also goes into the concept of sessions.](https://www.ory.sh/docs/hydra/concepts/before-oauth2)
