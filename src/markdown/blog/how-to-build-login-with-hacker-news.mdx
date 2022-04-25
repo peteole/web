@@ -238,7 +238,7 @@ export type OIDCAdapterClassFunction = (name: string) => void
   const { db, logger } = args
   logger } = args;
 
-  // Create anonymous class that performans as an Adapter usa
+  // Create anonymous class that performs as an Adapter usa
   return function DBOIDCAdapter(name) {
     this.name = name
     this.db = db
@@ -812,7 +812,7 @@ function processLoginResultData(envelope) {
     throw err
   }
 
-  // Show flash signalling successful login
+  // Show flash signaling successful login
   showPageFlash({
     variant: 'success',
     title: 'Login successful',
@@ -909,7 +909,7 @@ application and I'll email you!).
 ## Wrapup
 
 There's more to do, but that's it for today! For those following along at home,
-if you were writing code you'd have already succesfully built the functionality
+if you were writing code you'd have already successfully built the functionality
 that makes LoginWithHN tick.
 
 Thanks for coming along on this ride -- This project took a lot longer than it

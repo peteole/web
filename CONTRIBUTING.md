@@ -258,7 +258,7 @@ community a safe place for you and we've got your back.
   member, please contact one of the channel ops or a member of the Ory Web
   core team immediately.
 - Likewise any spamming, trolling, flaming, baiting or other attention-stealing
-  behaviour is not welcome.
+  behavior is not welcome.
 
 We welcome discussion about creating a welcoming, safe, and productive
 environment for the community. If you have any questions, feedback, or concerns

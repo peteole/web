@@ -32,19 +32,19 @@ Harassment includes, but is not limited to:
 - Deliberate intimidation, stalking, or following
 - Sustained disruption of talks or other events
 - Unwelcome sexual attention
-- Advocating for, or encouraging, any of the above behaviour
+- Advocating for, or encouraging, any of the above behavior
 
 **Enforcement**
 
 Participants asked to stop any harassing behavior are expected to comply
 immediately
 
-If a participant engages in harassing behaviour, event organisers retain the
+If a participant engages in harassing behavior, event organizers retain the
 right to take any actions to keep the event a welcoming environment for all
 participants. This includes warning the offender or expulsion from the
 conference.
 
-Event organisers may take action to redress anything designed to, or with the
+Event organizers may take action to redress anything designed to, or with the
 clear impact of, disrupting the event or making the environment hostile for any
 participants.
 
