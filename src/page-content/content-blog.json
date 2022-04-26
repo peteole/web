@@ -75,9 +75,9 @@
   ],
   "featured": {
     "title": "Featured blog posts",
-    "big": "/login-flutter-authentication-example-api-open-source/",
-    "top": "/cloud-ecommerce-frontend/",
-    "bottom": "/looking-at-keto/"
+    "big": "/auth-and-modern-software/",
+    "top": "/zero-trust-api-security-ory-tutorial/",
+    "bottom": "/tutorial-url-shortener-supabase-ory-integration/"
   },
   "seo": {
     "title": "Ory Developer Blog and Articles",
