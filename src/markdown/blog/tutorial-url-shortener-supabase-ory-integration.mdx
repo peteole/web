@@ -137,6 +137,8 @@ _Okay. Let's start hacking, shall we?_
 
 ## Configuration package
 
+Create a new folder for your project, and create a file `main.go`:
+
 <CodeFromRemote
   src="https://github.com/gen1us2k/shorts/blob/master/cmd/shorts/main.go"
   lang="golang"
@@ -211,7 +213,7 @@ Supabase uses Postgres as their main RDBMS. Also, they use
 [PostgREST](https://postgrest.org/en/stable/), a standalone web server that
 turns your PostgreSQL database directly into a RESTful API. The structural
 constraints and permissions in the database determine the API endpoints and
-operations. Here's the supabase implementation of the database layer.
+operations. The Supabase implementation of the database layer in `database/database.go`:
 
 <CodeFromRemote
   src="https://github.com/gen1us2k/shorts/blob/master/database/supabase.go"
@@ -225,7 +227,7 @@ An URL shortener is a simple project so we need only two endpoints:
 - Shorten URLs by passing a POST request to `/api/url`
 - Get created URLs by passing a GET request to `/api/url` endpoint
 
-Here's the implementation for our API:
+Here's the implementation for our API in `api/api.go`:
 
 <CodeFromRemote
   src="https://github.com/gen1us2k/shorts/blob/master/api/api.go"
@@ -258,6 +260,8 @@ the API should be available only for authenticated users.
 />
 
 ### Access rules for Ory Oathkeeper
+
+Create a folder `oathkeeper` to hold the Ory Oathkeeper access rules:
 
 <CodeFromRemote
   src="https://github.com/gen1us2k/shorts/blob/master/oathkeeper/access-rules.yml"
