@@ -33,8 +33,7 @@ shows you the final architecture we are going to build in this guid
 
 ![Kong with Ory products](./media/kong_hello.jpeg)
 
-The full source code for this tutorial is available on
-[github](https://github.com/gen1us2k/kong_showcase)
+[The full source code for this tutorial is available on GitHub](https://github.com/gen1us2k/kong_showcase).
 
 ## What we will use
 
@@ -178,8 +177,8 @@ curl -i -X POST \
 
 ## Testing
 
-You can open http://127.0.0.1:8000/hello or http://127.0.0.1:8000/world in your
-browser and there are two possible scenarios:
+You can open `http://127.0.0.1:8000/hello` or `http://127.0.0.1:8000/world` in
+your browser and there are two possible scenarios:
 
 - You receive `{"message": "Hello microservice"}` (or `"World microservice"`).
 - The browser redirects you to http://127.0.0.1:4455/login.
@@ -194,6 +193,6 @@ browser and there are two possible scenarios:
 - [Add two-factor authentication](https://www.ory.sh/docs/kratos/guides/two-factor-authentication-2fa-mfa).
 - Consider using
   [authentication based on subrequest result](https://docs.nginx.com/nginx/admin-guide/security-controls/configuring-subrequest-authentication/)
-  instead of having an additional reverse proxy inside your network
+  instead of having an additional reverse proxy inside your network.
 - [Kong auth request](https://github.com/ascho/kong-auth-request) can be an
-  excellent plugin to use oathkeeper as a decision API for Kong
+  excellent plugin to use Ory Oathkeeper as a decision API for Kong.
