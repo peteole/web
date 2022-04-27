@@ -1,18 +1,27 @@
 ---
-templateKey: blog
-path: '/tutorial-url-shortener-supabase-ory-integration/'
-author: gen1us2k
-title: Building an URL shortener with Supabase and Ory
-teaser:
-  Learn how to build a URL shortener using open source ready-to-use solutions
-  using the Ory Kratos and Supabase open source projects. Includes code examples
+path: '/tutorial-url-shortener-supabase-ory-integration-backend/'
+
+title: |
+  Ory & Supabase Url Shortener Part 1: Backend
+
+teaser: |
+  Learn how to build a URL shortener using the Ory Kratos and Supabase open source projects. Includes code examples
   for Go and Docker!
-subtitle:
-  Step-by-step guide to create URL shortener with authentication using Ory Cloud
-overline: Ory Supabase Integration
-publishedAt: 2022-03-15
+
+seo:
+  title: |
+    Integration example of Ory Kratos and Supabase
+  description: |
+    Learn how to build a URL shortener using open source ready-to-use solutions.
+  keywords: |
+    login, auth, authentication, registration, supabase, backend, api gateway, react, open source
+
+publishedAt: '2022-03-15'
+author: gen1us2k
 published: true
-description: ''
+
+overline: |
+  Ory Supabase Integration
 tags:
   - Guide
   - Authentication
@@ -33,8 +42,15 @@ broad open source communities.
 In this article, I'll show you an example of how to build an URL shortener using
 a modern open source technology stack.
 
+Here's an overview of the backend architecture we are going to build including
+[Ory Kratos](https://github.com/ory/kratos),
+[Supabase](https://supabase.com/docs), and
+[Ory Oathkeeper](https://github.com/ory/oathkeeper):
+
+![Supabase Kratos Architecture](./media/supabase/arch.png)
+
 You can find the source code for this project
-[on GitHub](https://github.com/gen1us2k/shorts).
+[on GitHub](https://github.com/ory/examples/blob/master/kratos-keto-oathkeeper-supabase).
 
 ## What we will use
 
@@ -43,7 +59,7 @@ You can find the source code for this project
   production I recommend [Ory Cloud](https://ory.sh/docs/cloud) - you get a
   fully featured Ory Kratos instance deployed and
   [ready to use for free](https://console.ory.sh/registration?preferred_plan=developer).
-- [Supabase](https://supabase.com) is the opensource alternative to Firebase.
+- [Supabase](https://supabase.com) is an open source alternative to Firebase.
   Supabase Database comes with a [Postgres](https://www.postgresql.org/)
   database, a free and open-source database that is considered one of the
   world's most stable and advanced databases. We'll use Supabase as database for
@@ -120,7 +136,7 @@ to choose to solve this issue, and the most popular frameworks are:
 - [Go-kit](https://github.com/go-kit/kit)
 
 Go-kit is an excellent framework for building a complex system with many
-microservices. Even a simple net/http with HTTP router would be enough for our
+micro-services. Even a simple net/http with HTTP router would be enough for our
 example. Usually, I toss a coin when I choose between Echo and Gin, so I use Gin
 in this project.
 
@@ -140,7 +156,7 @@ _Okay. Let's start hacking, shall we?_
 Create a new folder for your project, and create a file `main.go`:
 
 <CodeFromRemote
-  src="https://github.com/gen1us2k/shorts/blob/master/cmd/shorts/main.go"
+  src="https://github.com/ory/examples/blob/master/kratos-keto-oathkeeper-supabase/cmd/shorts/main.go"
   lang="golang"
 />
 
@@ -203,7 +219,7 @@ benefits:
   mock layer and use it in tests.
 
 <CodeFromRemote
-  src="https://github.com/gen1us2k/shorts/blob/master/database/database.go"
+  src="https://github.com/ory/examples/blob/master/kratos-keto-oathkeeper-supabase/database/database.go"
   lang="golang"
 />
 
@@ -213,10 +229,11 @@ Supabase uses Postgres as their main RDBMS. Also, they use
 [PostgREST](https://postgrest.org/en/stable/), a standalone web server that
 turns your PostgreSQL database directly into a RESTful API. The structural
 constraints and permissions in the database determine the API endpoints and
-operations. The Supabase implementation of the database layer in `database/database.go`:
+operations. The Supabase implementation of the database layer in
+`database/database.go`:
 
 <CodeFromRemote
-  src="https://github.com/gen1us2k/shorts/blob/master/database/supabase.go"
+  src="https://github.com/ory/examples/blob/master/kratos-keto-oathkeeper-supabasedatabase/supabase.go"
   lang="golang"
 />
 
@@ -230,7 +247,7 @@ An URL shortener is a simple project so we need only two endpoints:
 Here's the implementation for our API in `api/api.go`:
 
 <CodeFromRemote
-  src="https://github.com/gen1us2k/shorts/blob/master/api/api.go"
+  src="https://github.com/ory/examples/blob/master/kratos-keto-oathkeeper-supabase/api/api.go"
   lang="golang"
 />
 
@@ -239,7 +256,7 @@ Here's the implementation for our API in `api/api.go`:
 Create a file in `cmd/shorts/main.go` with the following content
 
 <CodeFromRemote
-  src="https://github.com/gen1us2k/shorts/blob/master/config/config.go"
+  src="https://github.com/ory/examples/blob/master/kratos-keto-oathkeeper-supabase/config/config.go"
   lang="golang"
 />
 
@@ -255,7 +272,7 @@ the API should be available only for authenticated users.
 ### Basic configuration for Ory Oathkeeper
 
 <CodeFromRemote
-  src="https://github.com/gen1us2k/shorts/blob/master/oathkeeper/oathkeeper.yml"
+  src="https://github.com/ory/examples/blob/master/kratos-keto-oathkeeper-supabase/oathkeeper/oathkeeper.yml"
   lang="yaml"
 />
 
@@ -264,7 +281,7 @@ the API should be available only for authenticated users.
 Create a folder `oathkeeper` to hold the Ory Oathkeeper access rules:
 
 <CodeFromRemote
-  src="https://github.com/gen1us2k/shorts/blob/master/oathkeeper/access-rules.yml"
+  src="https://github.com/ory/examples/blob/master/kratos-keto-oathkeeper-supabase/oathkeeper/access-rules.yml"
   lang="yaml"
 />
 
@@ -273,40 +290,44 @@ Create a folder `oathkeeper` to hold the Ory Oathkeeper access rules:
 You can follow the
 [Ory Kratos Quickstart](https://www.ory.sh/docs/kratos/quickstart) to add Ory
 Kratos to your project. You can inspect the
-[docker-compose](https://github.com/gen1us2k/shorts/blob/master/docker-compose.yml)
+[docker-compose](https://github.com/ory/examples/blob/master/kratos-keto-oathkeeper-supabasedocker-compose.yml)
 and the
-[Ory Kratos configuration](https://github.com/gen1us2k/shorts/tree/master/kratos)
+[Ory Kratos configuration](https://github.com/ory/examples/tree/master/kratos-keto-oathkeeper-supabase/kratos)
 folder in the repository, but this basic configuration is based on the
 Quickstart guide.
 
 ### Authentication middleware
-We configured Ory Oathkeeper to act as identity and access proxy,
-and our configuration does two things:
 
-- Check authentication and who the current session belongs by calling the [`sessions/whoami`](https://www.ory.sh/docs/kratos/reference/api#operation/toSession) endpoint of Ory Kratos.
-- Get the identity.id from the previous step and modify the request by adding a `X-User` header with the user's identity id.
+We configured Ory Oathkeeper to act as identity and access proxy, and our
+configuration does two things:
+
+- Check authentication and who the current session belongs by calling the
+  [`sessions/whoami`](https://www.ory.sh/docs/kratos/reference/api#operation/toSession)
+  endpoint of Ory Kratos.
+- Get the identity.id from the previous step and modify the request by adding a
+  `X-User` header with the user's identity id.
 
 It means that we do not need to take any additional steps for our Go
-application, and we can get the value from `X-User`
-header and use it in our application.
+application, and we can get the value from `X-User` header and use it in our
+application.
 
 <CodeFromRemote
-  src="https://github.com/gen1us2k/shorts/blob/master/middleware/middleware.go"
+  src="https://github.com/ory/examples/blob/master/kratos-keto-oathkeeper-supabase/middleware/middleware.go"
   lang="go"
 />
 
-## Conclusion & next steps
+## Next steps
 
 We have implemented the basic URL shortener API and added authentication with
 Ory Kratos and a SQL backend powered by Supabase. Feel free to
-[fork the repository](https://github.com/gen1us2k/shorts/) and play around with
-it.
+[fork the example](https://github.com/ory/examples/kratos-keto-oathkeeper-supabase)
+and play around with it.
 
 I hope you enjoyed this tutorial and found it helpful. If you have any
 questions, check out the Ory community on [Slack](https://slack.ory.sh/) and
 [GitHub](https://github.com/ory/kratos/discussions).
 
-> Stay tuned for part two, where we build the frontend!
+> [Check out Part 2 where we build the frontend!](https://www.ory.sh/tutorial-url-shortener-supabase-ory-frontend/)
 
 Some ideas to improve the backend further:
 

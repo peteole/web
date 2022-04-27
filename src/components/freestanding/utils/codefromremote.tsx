@@ -22,6 +22,8 @@ const detectLanguage = (src: string) => {
       return 'tsx'
     case 'ts':
       return 'typescript'
+    case 'vue':
+      return 'jsx'
     case 'go':
       return 'go'
     case 'yaml':

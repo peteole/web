@@ -233,7 +233,7 @@ that case, `make` can help us -
 automate operations since 1976. Also it always a great idea to have them
 self-documented:
 
-```make
+```bash
 .PHONY: help
 
 help:

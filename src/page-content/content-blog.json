@@ -77,7 +77,7 @@
     "title": "Featured blog posts",
     "big": "/auth-and-modern-software/",
     "top": "/zero-trust-api-security-ory-tutorial/",
-    "bottom": "/tutorial-url-shortener-supabase-ory-integration/"
+    "bottom": "/tutorial-url-shortener-supabase-ory-integration-backend/"
   },
   "seo": {
     "title": "Ory Developer Blog and Articles",
