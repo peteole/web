@@ -512,6 +512,26 @@ export const team: TeamProps = {
           src="../../images/team/tomasz.png"
         />
       )
+    },{
+      name: 'Stephan Reinartz',
+      position: 'Head of Customer Experience',
+      social: [
+        {
+          network: SocialNetworks.linkedin,
+          href: 'https://www.linkedin.com/in/stephan-reinartz/'
+        }
+      ],
+      img: (
+        <StaticImage
+          placeholder="blurred"
+          layout="constrained"
+          aspectRatio={1}
+          loading="lazy"
+          className="responsive"
+          alt="Stephan Reinartz"
+          src="../../images/team/stephan.png"
+        />
+      )
     }
   ]
 }
