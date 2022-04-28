@@ -1,0 +1,134 @@
+---
+path: '/login-spa-react-nextjs-authentication-example-api-open-source/'
+
+title: |
+  We replaced our ID infrastructure with Ory
+
+teaser: |
+  Add login, registration, user and profile management to Next.js Single Page Applications
+  in minutes using the Ory Kratos open source project. Includes code examples for TypeScript
+  and Docker, and end-to-end tests!
+
+seo:
+  title: |
+    Authentication for Next.js / React Single Page Applications
+  description: |
+    Add open source login to any Next.js and React single page app (SPA) using free open source.
+  keywords: |
+    login, auth, authentication, registration, reactjs, vercel, nextjs, react, spa, single page app, native desktop,
+    open source, ory, ory kratos
+
+publishedAt: '2021-11-08'
+author: aeneasr
+
+overline: |
+  Next.js React Authentication
+tags:
+  - Guide
+  - Authentication
+  - Ory Cloud
+  - Open Source
+  - Serverless
+  - User Management
+---
+
+Hi, I am [Sawada](https://github.com/sawadashota), a developer of authentication and authorization servers at [TIER IV, inc.](https://tier4.jp/).
+In this article, I would like to introduce a case study of replacing our in-house ID infrastructure with Ory ([Ory Kratos](https://github.com/ory/kratos/), [Ory Hydra](https://github.com/ory/hydra/), and [Ory Oathkeeper](https://github.com/ory/oathkeeper/)) and application by Go language.
+TIER IV is looking for members who can work with us to develop an authentication and authorization servers. If you are interested, [please apply here](https://herp.careers/v1/tier4/hd8y-l009irp).
+
+## Background
+
+### About our ID infrastructure
+
+We have several services, including an fleet management system (abbr: FMS), a remote monitoring and control system, and a map editor for autonomous driving. Users create an account once, they can use those services. This is a small component although it would be large impact if it has a problem. This ID infrastructure has only features; account management and ID federation.
+The ID infrastructure is very compact, because the authorization server is separated. This article does not introduce the authorization server. If you want to know it, please refer to the material presented at past meet up.
+https://www.slideshare.net/KotaroHoshi/ss-245496424/KotaroHoshi/ss-245496424
+
+### Why replace at this time?
+
+Before the replacement, The ID infrastructure was not that old. However, we had problems.
+The OpenID Provider library that was being used was no longer maintained and needed to be forked and patched
+the number of requests was increasing, and it was getting stuck on requests in spite of not very large traffic
+Memory leaks
+We were not in a situation where we had to replace the system right now. But we knew that it would not be able to withstand the expansion of the service in the future when more traffic flowed and higher reliability was required. And it was good timing because ID infrastructure had become much smaller. So that we decided to replace it at this time, when the number of users was still small and the data was easy to migrate.
+
+### What kind of data we MUST migrate?
+
+In replacing the system, we wanted to use managed services (for example, Cognito because we use AWS; managed services that charge by users count are not acceptable because they do not match our services) and OSS as much as possible, and we considered implementing from scratch as a last resort. However, our options are limited when considering migration of existing data.
+Specifically, we have considered whether the following requirements are necessary
+Can the identifer of the account be changed?
+Can the Client ID and Secret of the OpenID Connect be changed?
+Can user passwords be force reset?
+
+### Can the identifer of the account be changed?
+
+No. Because of microservices architecture, account IDs are persisted in various services. It is difficult to identify them all and apply migration without leaving them behind.
+Because the IDs that Django was issued were Auto Increment IDs, we were unable to find a service/OSS that could import existing account IDs without modification.
+However, we can ignore this problem if a mechanism can be inserted to convert the issued ID instead of using it as it is. As described below, the new ID infrastructure implements this.
+<Image here>
+
+### Can the Client ID and Secret of the OpenID Connect be changed?
+
+Yes. Of course, it would have been nice to be able to migrate, but most of the internal Clients were, and the Clients used outside the company were also within the scope of changeable.
+
+### Can user passwords be force reset?
+
+No. Not only is this a bad usability, but there was a term in the past when we did not verify that the email address was a sendable email address. So some user might not enable be reset password.
+So we needed new system to import PBKDF2 but this requirement made AWS Cognito out of option.
+
+## New ID infrastructure architecture
+
+We decided uses ORY’s stack. Ory Kratos as the Identity Server, Ory Hydra as the OpenID Provider, and Ory Oathkeeper as the IAP (Identity & Access Proxy). And we implemented service specific logics, federating Kratos and Hydra, and UI.
+Keycloak is well-known as an OSS identity infrastructure, but we chose ORY’s OSS for the following reasons.
+Ory provides each features as small component. This makes it easy to maintain compatibility when migrating existing data and features.
+We are familiar with Go language. So it is easy to follow the source code when problems or questions.
+I have experience using and contributing to Ory Hydra in the past. So when we have problems, I can solve them by contributing.
+<Image here>
+Then, I will introduce each system component in new ID infrastructure.
+
+### Ory Kratos
+
+A headless Identity Server OSS that implements user management and authentication.
+https://github.com/ory/kratos
+The main features implemented are
+Login
+Logout
+User registration
+Profile Management
+Account Recovery
+Email Verification
+MFA
+FYI: I also wrote about this Advent calendar for 2021.
+https://qiita.com/sawadashota/items/e76e96408ffd9e11f268
+We could use Ory Kratos or not. It depended on whether Krato can import password hashed by PBKDF2. I created an issue, implemented, finally merged. Now Kratos can import password hashed by PBKDF2 and upgrade to primary algorithm (Argon2id or bcrypt).
+https://github.com/ory/kratos/issues/1659
+Now Kratos can import credentials for new account by using API. But this API was not implemented when we released new ID infrastructure, we had to implement storing password hashes directly in the Kratos database.
+https://www.ory.sh/docs/kratos/reference/api#operation/adminCreateIdentity
+
+### Ory Hydra
+
+OpenID Connect Certified OpenID Provider OSS.
+https://github.com/ory/hydra
+Normally, Hydra generates Client ID and Secret automatically. But we can import it if we set Client ID and Secret.
+
+### Ory Oathkeeper
+
+This is a proxy OSS that provides access control.
+https://github.com/ory/oathkeeper
+It propagates session user information to Upstream and performs Access Token Scope validation. If you want to authorize users, you need to use Ory Keto or OPA (Open Policy Agent), but we did not use them this time.
+We also use it to protect Kratos and Hydra’s administrative APIs. Eventually we would like to authorize users. But we have issued OAuth 2.0 Client for admin API, and just scope authorization. It is enough for us now.
+
+### My Application
+
+It will be a component that implements miscellaneous missing items, but specifically provides the following features
+UI for each of the features provided by Kratos
+Any additional validation or other processing before POST to Kratos
+Working with Kratos and Hydra
+Mapping for account identifier to compatible with Django issued
+APIs to federate other system components
+The ID infrastructure before the replacement was made in Python (Django), but this time it was implemented in Go language.
+
+## Finally I thought
+
+I am relieved bevause We were able to complete the process without any problems. I think that a major factor in the success of the project was the fact that unnecessary features were removed prior to replcement and the migration scope was minimized. In order to remove unnecessary features, we collaborated with the business and legal departments, and after notifying users and implementing for the removal, finallly the features were removed. I feel that the process went smoothly, but it still took a lot of time overall. If we had to start the replacement from this point, it would have required a considerable amount of time. But fortunately, the timing was very good, as the replacement was done at the same time as this.
+The replacement was completed in about three months, and I think we were able to build it quickly by utilizing OSS. We are still only replacing the same feature. So we would like to add features from now.
