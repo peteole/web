@@ -7,6 +7,8 @@ metaDescription: 'Ory Hydra Changelog'
 lastUpdatedAt: 'April 12, 2022'
 ---
 
+[Visit the source for the Ory Hydra Changelog on GitHub.](https://github.com/ory/hydra/blob/master/CHANGELOG.md)
+
 # [1.11.7](https://github.com/ory/hydra/compare/v1.11.6...v1.11.7) (2022-02-23)
 
 Ory Hydra has a new place for documentation at
