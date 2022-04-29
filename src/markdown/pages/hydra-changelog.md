@@ -6634,10 +6634,9 @@ Signed-off-by: Euan Kemp <euank@euank.com>
   1. Malice initiates an OAuth 2.0 Authorization Code Flow:
      https://hydra/oauth2/auth?client=...
 
-
-      - Hydra creates the consent request id and an additional CSRF token
-        which is stored in the database and the encrypted cookie. Malice
-        is not able to see the CSRF token.
+     - Hydra creates the consent request id and an additional CSRF token which
+       is stored in the database and the encrypted cookie. Malice is not able to
+       see the CSRF token.
 
   2. Hydra redirects malice to the consent app and appends consent id
      "example-id": https://consent-app/?consent=example-id
@@ -6912,10 +6911,9 @@ contains this patch does not require any code changes or deployment changes.
   1. Malice initiates an OAuth 2.0 Authorization Code Flow:
      https://hydra/oauth2/auth?client=...
 
-
-      - Hydra creates the consent request id and an additional CSRF token
-        which is stored in the database and the encrypted cookie. Malice
-        is not able to see the CSRF token.
+     - Hydra creates the consent request id and an additional CSRF token which
+       is stored in the database and the encrypted cookie. Malice is not able to
+       see the CSRF token.
 
   2. Hydra redirects malice to the consent app and appends consent id
      "example-id": https://consent-app/?consent=example-id
@@ -7208,10 +7206,9 @@ Signed-off-by: Euan Kemp <euank@euank.com>
   1. Malice initiates an OAuth 2.0 Authorization Code Flow:
      https://hydra/oauth2/auth?client=...
 
-
-      - Hydra creates the consent request id and an additional CSRF token
-        which is stored in the database and the encrypted cookie. Malice
-        is not able to see the CSRF token.
+     - Hydra creates the consent request id and an additional CSRF token which
+       is stored in the database and the encrypted cookie. Malice is not able to
+       see the CSRF token.
 
   2. Hydra redirects malice to the consent app and appends consent id
      "example-id": https://consent-app/?consent=example-id
@@ -7413,10 +7410,9 @@ contains this patch does not require any code changes or deployment changes.
   1. Malice initiates an OAuth 2.0 Authorization Code Flow:
      https://hydra/oauth2/auth?client=...
 
-
-      - Hydra creates the consent request id and an additional CSRF token
-        which is stored in the database and the encrypted cookie. Malice
-        is not able to see the CSRF token.
+     - Hydra creates the consent request id and an additional CSRF token which
+       is stored in the database and the encrypted cookie. Malice is not able to
+       see the CSRF token.
 
   2. Hydra redirects malice to the consent app and appends consent id
      "example-id": https://consent-app/?consent=example-id
