@@ -33,8 +33,8 @@ export const sharedQuotes: QuoteProps = {
       description: (
         <>
           We enjoy using Ory because of the simplicity to integrate thanks to
-          its modularity, its active and vocal developer base, and the extent 
-          to and ease by which Ory tools can be configured.
+          its modularity, its active and vocal developer base, and the extent to
+          and ease by which Ory tools can be configured.
         </>
       ),
       person: `Matt Brown`,

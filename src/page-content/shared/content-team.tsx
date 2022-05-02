@@ -512,7 +512,8 @@ export const team: TeamProps = {
           src="../../images/team/tomasz.png"
         />
       )
-    },{
+    },
+    {
       name: 'Stephan Reinartz',
       position: 'Head of Customer Experience',
       social: [

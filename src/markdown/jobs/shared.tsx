@@ -9,8 +9,8 @@ export const About = () => (
       trust network “Ory Cloud” is a global, scalable and secure platform for
       managing identities and its distribution across various internet services
       including IoT and emerging Fintech systems. Ory is a modern software
-      start-up founded in 2019 that promotes an open, diverse, and
-      collaborative working culture.
+      start-up founded in 2019 that promotes an open, diverse, and collaborative
+      working culture.
     </p>
   </>
 )
