@@ -1,0 +1,171 @@
+---
+path: '/cli-post/'
+
+title: |
+  Ory Devtools: Ory CLI `patch project`
+
+teaser: |
+  Ory CLI teaser text
+
+seo:
+  title: |
+    Ory CLI title
+  description: |
+    Ory CLI description
+  keywords: |
+    login, auth, authentication, registration, CLI, cloud native, open source, ory, ory kratos, command line interface, command line, bash, shell, script, gitflow, gitops, git, automation
+
+publishedAt: '2022-05-08'
+author: vinckr
+
+overline: |
+  Developer CLI
+tags:
+  - Guide
+  - Authentication
+  - Ory Cloud
+  - Open Source
+  - User Management
+---
+
+Great developer experience is the founding tenet of Ory and as such we are happy to now have a powerful CLI tool that lets you run and configure your Ory Cloud projects. As the CLI is under constant development, this series of blogposts aims to highlight some of the less documented or publicized aspects of the Ory CLI. Why am I so excited about the new Ory CLI? Because now you have the full configuration for Ory Kratos -  (Ory Kratos is the [open source identity service that is used by Ory Cloud](https://github.com/ory/kratos)) - at your fingertips. Previously we were limited in what was available through the [console UI](https://console.ory.sh/) - which to be honest covers most use cases - but now we can configure the rest through the Ory CLI.
+
+In this post I am going to show some thing you can do with `ory patch project`, which is the CLI command to change (amend, patch) the Ory Cloud Project Configuration. You can also [upload a full configuration using `ory update project`](https://www.ory.sh/docs/guides/cli/config-with-cli#overwrite--import-configuration) - or rather overwrite with your full configuration.  With [`ory patch projects`](https://www.ory.sh/docs/guides/cli/config-with-cli#patch-configuration) you just configure single items (e.g. a redirect or token lifetime), for bigger changes it is easier to use a full configuration with [`ory update project`](https://www.ory.sh/docs/guides/cli/config-with-cli#overwrite--import-configuration). With this you can automatically switch configurations between different projects, for example staging and production and I will cover it in-depth in the next edition of this series. 
+
+The base command is the following:
+
+```bash
+ory patch project <your-project-id> --replace '/services/identity/config/...'
+```
+
+`/services/identity/config/`
+
+As we want to configure Ory Kratos, the Ory identity services, that is the standard path for the replace flag.
+If we want to for example configure the UI URL of the self-service registration flow this is the path we would use.
+`/services/identity/config/selfservice/flows/registration/ui_url/`
+
+[Have a look at the full Ory Kratos configuration](https://ory.sh/docs/kratos/reference/configuration) to get an idea of this is is structured.
+
+## Export full configuration
+
+If you want to check out your full Ory Cloud project configuration you can export it with a simple command 
+
+```bash
+ory get identity-config <your-project-id> --format json-pretty
+```
+
+The normal output is more machine than human-readable, so I recommend you use the flag `--format json-pretty` to format it nicely - or `--format yaml` if you prefer that ;)
+For example to confirm that everything is configured correctly - you can also do this on console.ory.sh but not all configuration options have an UI. 
+You can also export your configuration from a staging or development project and copy it over to your production project, or implement a git-based configuration workflow using the Ory CLI.
+
+Let us know what usecases you can think of or would like to see supported with the Ory CLI!
+
+Lets dive in a few areas where the Ory CLI can be helpful:
+
+## Custom UI configuration
+
+```bash
+ory patch project <your-project-id> --replace '/services/identity/config/selfservice/flows/registration/ui_url="http://localhost:3000/registration"'
+```
+
+```bash
+ory patch project <your-project-id> --replace '/services/identity/config/selfservice/flows/login/ui_url="http://localhost:3000/login"'
+```
+
+```bash
+ory patch project <your-project-id> --replace '/services/identity/config/selfservice/flows/settings/ui_url="http://localhost:3000/settings"'
+```
+
+```bash
+ory patch project <your-project-id> --replace '/services/identity/config/selfservice/flows/verification/ui_url="http://localhost:3000/verification"'
+```
+
+```bash
+ory patch project <your-project-id> --replace '/services/identity/config/selfservice/flows/recovery/ui_url="http://localhost:3000/recovery"'
+```
+
+```bash
+ory patch project <your-project-id> --replace '/services/identity/config/selfservice/flows/error/ui_url="http://localhost:3000/error"'
+```
+
+You can also configure those through the console UI.
+
+## Default Return URLs
+
+We can also configure the URL where users end up after a selfservice flow, for example after logging out of the application you usually want to display the login screen. 
+So as before we use `/services/identity/config/selfservice/flows/logout/` as base config path but this time adding `after/default_browser_return_url` to configure what happens _after_ the logout. 
+
+```bash
+ory patch project <your-project-id> --replace '/services/identity/config/selfservice/flows/logout/after/default_browser_return_url="/ui/login"'
+```
+
+In the same way we can configure the other selfservice flow return URLs, for example when you want the user to re-authenticate after changing the password in the settings flow, you can configure this in `/flows/settings/after/password/`:
+
+```bash
+ory patch project <your-project-id> --replace '/services/identity/config/selfservice/flows/settings/after/password/default_browser_return_url="/ui/login"'
+```
+
+You can also configure these return URLs through the console UI.
+
+## Identity Schemas
+
+The identity schema can be most easily configured in the console UI, but you can still do some things through the CLI if you prefer. This is one of the areas where I would actually much prefer the console UI with validation, naming the schemas and so on. Most of the time you wont
+make changes to the identity schema often and save buiness-logic related data outside of Ory.
+With the export function you can find out the id and url of your current schema. If you are using for example the default email/password schema the id is `preset://email`, but for a custom schema the id will be a long string. 
+We can change the default to for example the username/password schema with the Ory CLI:
+
+```bash
+ory patch project <your-project-id> --replace '/services/identity/config/schemas/id/logout/after/default_browser_return_url="/ui/login"'
+```
+
+## Flow lifespan
+
+You can as of the writing of this post configure the session lifespan in the Ory Cloud console.ui but not the flow lifespans. So if you want the login flow to be valid only one nanosecond, this is easy with the CLI:
+
+```bash
+ory patch project <your-project-id> --replace '/services/identity/config/selfservice/flows/login/lifespan="1ns"'
+```
+
+or if the session should last until 2122:
+
+```bash
+ory patch project <your-project-id> --replace '/services/identity/config/selfservice/flows/login/lifespan="876000h"'
+```
+
+On a more serious note, you can configure this in any format from nanoseconds to hours.
+
+## More fun with flows
+
+You can also disable registration, but something you currently can't disable in the UI is recovery and verification - most people want their users to have a way to recover their account and verify it through for example an email. But if you want to disable recovery for some reason you can do it with the Ory CLI!
+
+```bash
+ory patch project <your-project-id> --replace '/services/identity/config/selfservice/flows/recovery/enabled=false'
+```
+
+This configuration option is a boolean value (true/false) so no `""` required as with others that are string values.
+
+## Hooks
+
+Custom hooks are awesome, but you cant configure them through the console UI yet. 
+
+You can however using the CLI :tada:
+
+Probably the easies way to do this is to export your current configuration:
+
+```bash
+ory get identity-config <your-project-id> --format json-pretty
+```
+
+then add the hook you want to use to your exported configuration and then import as new configuration: 
+
+https://www.ory.sh/docs/guides/cli/config-with-cli#operation/getVersion
+
+Some hooks like the `login/session` hook (meaning users get a session / are signed in immediately after they register successfully) are available in the console UI, you can find them under "Authentication Settings".
+
+### More Tips
+
+TODO
+
+```bash
+your_project_slug=$(ory create project --name test --format json | jq -r '.slug') export ORY_SDK_URL=https://$your_project_slug.projects.oryapis.com
+```
