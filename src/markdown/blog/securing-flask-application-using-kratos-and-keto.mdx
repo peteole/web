@@ -28,7 +28,7 @@ the pythonic world.
 In this article, I'll show you an example of how to add everything we need for
 the user's authentication without writing lots of lines of code. The code used
 in this blog post is available on
-[GitHub](https://github.com/gen1us2k/kratos_flask_example). We'll use
+[GitHub](https://github.com/ory/examples/tree/master/kratos-keto-flask). We'll use
 [Flask](https://flask.palletsprojects.com/en/2.0.x/),
 [flask cookie-cutter](https://github.com/cookiecutter-flask/cookiecutter-flask),
 [docker](https://www.docker.com/),
@@ -59,13 +59,13 @@ Keto
 Ory Kratos will be responsible for storing identity data such as email/login and
 password. Using the [quickstart](https://www.ory.sh/kratos/docs/quickstart)
 guide we need to copy the contents of
-[contrib/quickstart/kratos/email-password](https://github.com/ory/kratos/tree/master/contrib/quickstart/kratos/email-password)
+[contrib/quickstart/kratos/email-password](https://github.com/ory/kratos/tree/master/kratos-keto-flask/contrib/quickstart/kratos/email-password)
 to the root of your project and then add the following content to the
 docker-compose:
 
 <CodeFromRemote
   lang="yml"
-  src="https://github.com/gen1us2k/kratos_flask_example/blob/master/docker-compose.yml"
+  src="https://github.com/ory/examples/blob/master/kratos-keto-flask/docker-compose.yml"
   startAt="postgres-kratos:"
   endAt="postgres-keto:"
 />
@@ -81,7 +81,7 @@ and have a `keto/keto.yml` file with the following content:
 
 <CodeFromRemote
   lang="yml"
-  src="https://github.com/gen1us2k/kratos_flask_example/blob/master/keto/keto.yml"
+  src="https://github.com/ory/examples/blob/master/kratos-keto-flask/keto/keto.yml"
   startAt="postgres-keto:"
   endAt="volumes:"
 />
@@ -96,7 +96,7 @@ We need the following containers:
 
 <CodeFromRemote
   lang="yml"
-  src="https://github.com/gen1us2k/kratos_flask_example/blob/master/docker-compose.yml"
+  src="https://github.com/ory/examples/blob/master/kratos-keto-flask/docker-compose.yml"
   startAt="postgresd-auth:"
 />
 
@@ -128,12 +128,12 @@ _Cons_
 
 <CodeFromRemote
   lang="yml"
-  src="https://github.com/gen1us2k/kratos_flask_example/blob/master/app/public/views.py"
+  src="https://github.com/ory/examples/blob/master/kratos-keto-flask/app/public/views.py"
   startAt="HTTP_STATUS_FORBIDDEN = 403"
 />
 
 You can find the full code used for this blog post on
-[GitHub](https://github.com/gen1us2k/kratos_flask_example).
+[GitHub](https://github.com/ory/examples/tree/master/kratos-keto-flask).
 
 ## Nota bene
 

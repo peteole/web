@@ -33,7 +33,7 @@ shows you the final architecture we are going to build in this guid
 
 ![Kong with Ory products](./media/kong_hello.jpeg)
 
-[The full source code for this tutorial is available on GitHub](https://github.com/gen1us2k/kong_showcase).
+[The full source code for this tutorial is available on GitHub](https://github.com/ory/examples/tree/master/kratos-oathkeeper-kong).
 
 ## What we will use
 
@@ -66,7 +66,7 @@ The "World" microservice exposes a `/world` API endpoint and returns a simple
 JSON message:
 
 <CodeFromRemote
-  src="https://github.com/gen1us2k/kong_showcase/blob/master/world/main.go"
+  src="https://github.com/ory/examples/blob/master/kratos-oathkeeper-kong/world/main.go"
   lang="go"
 />
 
@@ -74,7 +74,7 @@ The "Hello" microservice exposes a `/hello` API endpoint and returns a simple
 JSON message:
 
 <CodeFromRemote
-  src="https://github.com/gen1us2k/kong_showcase/blob/master/hello/main.go"
+  src="https://github.com/ory/examples/blob/master/kratos-oathkeeper-kong/hello/main.go"
   lang="go"
 />
 
@@ -92,7 +92,7 @@ up Ory Kratos. In this tutorial you only need a docker-compose file with the
 following configuration:
 
 <CodeFromRemote
-  src="https://github.com/gen1us2k/kong_showcase/blob/master/docker-compose.yml"
+  src="https://github.com/ory/examples/blob/master/kratos-oathkeeper-kong/docker-compose.yml"
   lang="yaml"
   startAt="postgres-kratos:"
 />
@@ -123,14 +123,14 @@ robust configuration for our service. Here is how we configure the access rules
 for Ory Oathkeeper:
 
 <CodeFromRemote
-  src="https://github.com/gen1us2k/kong_showcase/blob/master/oathkeeper/access-rules.yml"
+  src="https://github.com/ory/examples/blob/master/kratos-oathkeeper-kong/oathkeeper/access-rules.yml"
   lang="yaml"
 />
 
 The Ory Oathkeeper configuration:
 
 <CodeFromRemote
-  src="https://github.com/gen1us2k/kong_showcase/blob/master/oathkeeper/oathkeeper.yml"
+  src="https://github.com/ory/examples/blob/master/kratos-oathkeeper-kong/oathkeeper/oathkeeper.yml"
   lang="yaml"
 />
 
@@ -143,7 +143,7 @@ only authenticated requests. It redirects to login UI if there's no
 Now all that is needed is to configure Kong:
 
 <CodeFromRemote
-  src="https://github.com/gen1us2k/kong_showcase/blob/master/docker-compose.yml"
+  src="https://github.com/ory/examples/blob/master/kratos-oathkeeper-kong/docker-compose.yml"
   lang="yaml"
   startAt="services:"
   endAt="hello"
