@@ -5,11 +5,11 @@ title: |
   How we built a student project platform using Graphql, React, Golang, Ory Kratos and Kubernetes
 
 teaser: |
-  Build a platform to share side projects and explore what your peers are making, using open source software and Ory Kratos for authentication.
+  Build a social networking to share side projects and explore what your peers are making, using open source software and Ory Kratos for authentication.
 
 seo:
   title: |
-    Authentication for React Graphql Kubernetes Golang with Examples
+    Authentication for React, Graphql, and Kubernetes written in Go with Examples
   description: |
     Add open source login to any React app using free open source, Kubernetes and Graphql.
   keywords: |
@@ -33,10 +33,9 @@ tags:
 ---
 
 We built a [student project platform](https://huddle.hsg.fs.tum.de) where
-students can share their sideprojects and explore what their peers are doing and
+students can share their side-projects and explore what their peers are doing and
 the authentication is done by Ory Kratos! This is the third part of a series on
-our learnings during the development process published on dev.to, which is the
-one about authentication. Feel free to have a look at the parts about the
+our learnings during the development process with a focus on authentication. Feel free to have a look at the parts about the
 [architecture of our GraphQL backend](https://dev.to/peteole/how-we-built-a-student-project-platform-using-graphql-react-golang-ory-kratos-and-kubernetes-part-1-19jg)
 and
 [how we consume it in a typesafe way](https://dev.to/peteole/how-we-built-a-student-project-platform-using-graphql-react-golang-ory-kratos-and-kubernetes-part-1-19jg)
@@ -48,11 +47,11 @@ We have three software components that are involved in the authentication
 process:
 
 1. The React UI. The user enters their password here and wants to see their
-   protected data
+   protected data.
 2. The GraphQL API. The API wants to verify that requests that need
    authentication really come from the user the request claims to come from.
-   Located in our kubernetes cluster
-3. Ory Kratos. Kratos manages user login credentials. Located in our kubernetes
+   Located in our Kubernetes cluster.
+3. Ory Kratos. Kratos manages user login credentials. Located in our Kubernetes
    cluster, too.
 
 Since I have been confused by it in the beginning, I created an image of all the
@@ -61,29 +60,27 @@ messages sent in a typical login:
 
 ## Flows
 
-Ory Kratos often works with so-called _flows_. A flow is a process that my
-consist of several steps such as account recovery or login (with MFA in the
-future). For login with username/password this may seem like an overkill since
+Ory Kratos often works with so-called [_flows_](https://www.ory.sh/docs/kratos/self-service). A flow is a process that may
+consist of several steps such as account recovery or login with MFA. For login with username/password this may seem like an overkill since
 there is only a singe request (send credentials in exchange for session cookie),
-but I expect the flow pattern is used here to allow for MFA logins in the
-future.
+but the flow pattern is used to allow for MFA logins in the future.
 
 So the login is as follows:
 
-1. Request a login flow
-1. Kratos returns login flow ID
-1. Send login to Ory Kratos, referencing the flow ID
-1. Kratos returns session cookie
-1. Request protected field from GQL api, attaching session cookie
-1. GQL API asks Ory Kratos to verify session cookie
-1. Kratos returns user ID belonging to session cookie
-1. GQL API returns protected field
+1. Request a login flow.
+1. Kratos returns login flow ID.
+1. Send login to Ory Kratos, referencing the flow ID.
+1. Kratos returns session cookie.
+1. Request protected field from GQL api, attaching session cookie.
+1. GQL API asks Ory Kratos to verify session cookie.
+1. Kratos returns user ID belonging to session cookie.
+1. GQL API returns protected field.
 
-## Redirects / Account recovery
+## Redirects and Account recovery
 
-Sometimes, Kratos and the user interface need another concept to interact. Let's
+Sometimes, Ory Kratos and the user interface need another concept to interact. Let's
 say you forgot your password and requested a recovery link via mail. The problem
-Ory Kratos developers needed to solve here is to send some _token_ from the
+Ory developers needed to solve here is to send some _token_ from the
 recovery link back to Ory Kratos (to verify the email) and at the same time
 associate it with a session of the UI in a web browser so that the user can
 reset their password in the UI, and all with minimal knowledge of the specific
@@ -98,24 +95,24 @@ follows:
 1. User clicks recovery link in the format
    `https://huddle.hsg.fs.tum.de/.ory/kratos/self-service/recovery?flow=6b817dhf-4717-48we-a756-cd7902b43ce6&token=QiGjssJcvB08H7cUdE3tyXvQr1i4OSaR`.
    Note that this will result in a GET request by the browser that will be
-   handled by Ory Kratos totally independent from the UI!
+   handled by Ory Kratos independent from the UI!
 2. Kratos verifies the query parameters and responds with a redirect to a
    pre-configured URL such as `https://huddle.hsg.fs.tum.de/ui/profile`. A
    session cookie is set as well so that future requests by the user can be
-   authenticated
+   authenticated.
 3. After the redirect, the web application UI takes over. For instance the user
    can set a new password on the profile site.
 
 ## Deployment and secret management
 
 Let's first go through the deployment of Ory Kratos itself, which we do in
-[Kubernetes](https://kubernetes.io/) with [helm](https://helm.sh/) and
+[Kubernetes](https://kubernetes.io/) with [Helm](https://helm.sh/) and
 [Helmfile](https://github.com/roboll/helmfile).
 
-Kratos has a [Helm Chart](https://k8s.ory.sh/helm/kratos.html) that allows to
-install Ory Kratos in a cluster more or less conveniently. The interesting thing
-is how to configure Ory Kratos (set redirect links, email-credentials etc.). We
-to it by providing values to the helm chart in our Helmfile. All this is managed
+Ory Kratos has a [Helm Chart](https://k8s.ory.sh/helm/kratos.html) that allows to
+install it in a cluster more or less conveniently. The interesting part here
+is how to configure Ory Kratos (set redirect links, email-credentials, and more). We
+do this by providing values to the Helm Chart in our Helmfile. All this is managed
 in our [deployment repo](https://gitlab.lrz.de/projecthub/deployment):
 
 ```txt
@@ -194,13 +191,13 @@ secret:
 This config consists of two parts:
 
 1. The `kratos.config` subfields follow the schema for configuring Ory Kratos
-   independent from kubernetes, as described
+   independent from Kubernetes, as described
    [here](https://www.ory.sh/docs/kratos/reference/configuration). As you can
    see we set various fields such as the email address to use for account
-   recovery, the url to redirect to after recovery and the
+   recovery, the URL to redirect to after recovery and the
    [identity schema to use for storing account data](https://www.ory.sh/docs/kratos/concepts/identity-schema)
    in base 64 encoding.
-2. The `secret` subfields are used for a kubernetes-specific way to provide
+2. The `secret` subfields are used for a Kubernetes-specific way to provide
    credentials since we don't want to save them in plain text. We state that Ory
    Kratos should use a secret called `secret-kratos` to get credentials rather
    than try to take them from the plain text config. This allows us to create
@@ -222,12 +219,12 @@ stringData:
   smtpConnectionURI: smtps://huddle.bot@zohomail.eu:qnIAsdHmsuU@smtp.zoho.eu:465
 ```
 
-(of course I replaced the credentials by hitting the keyboard as wild :smiley:)
+(of course I replaced the credentials by  wildly smashing the keyboard 😁)
 
 Now running `helmfile sync` will deploy Ory Kratos to our cluster!
 
 Finally we need to publicly expose Ory Kratos using an ingress controller in
-kubernetes:
+Kubernetes:
 
 ```yaml
 apiVersion: networking.k8s.io/v1
@@ -257,20 +254,6 @@ spec:
                 port:
                   number: 80
 ```
-
-However two things feel a bit hacky about the deployment:
-
-1. Even though we correctly set the base URL in the Ory Kratos config, we need
-   to do
-   [regex magic to rewrite the path as if Ory Kratos was hosted under the root path](https://kubernetes.github.io/ingress-nginx/user-guide/ingress-path-matching/).
-2. I was unable to find a way to put the Ory Kratos config in its own file
-   (which would for instance enable intellisense in VSCode) and include that
-   file as a subfield of the `kratos.config` field of the helm config
-3. Running `helmfile sync` after altering some Ory Kratos preferences does NOT
-   deploy these changes to the cluster. You need to delete the Ory Kratos
-   deployment and then run the sync comment.
-
-Do you have any tips on how to solve this?
 
 ## The login UI
 
