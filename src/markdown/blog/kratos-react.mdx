@@ -101,7 +101,7 @@ clone it and run the following commands:
   />
 </video>
 
-```bash
+```shell
 git clone https://github.com/ory/kratos-nextjs-react-example.git
 cd kratos-nextjs-react-example
 npm i
@@ -110,24 +110,63 @@ npm i
 Per default, this app uses the public playground deployment of Ory Kratos at
 `https://playground.projects.oryapis.com`. To use it, simply run:
 
-```
+```shell
 npm run dev
 ```
 
-If you want to use your own Ory Kratos instance, you can use the
-`ORY_KRATOS_URL` or `ORY_SDK_URL` environment variable. The easiest way to run
-Ory Kratos is in an
-[Ory Cloud Project](https://www.ory.sh/docs/start-building/create-project)
-_(free for developers)_! In that case, set the `ORY_SDK_URL` to your
-[project's SDK url](https://www.ory.sh/docs/concepts/services-api):
+To use your own Ory Kratos instance, you can use the `ORY_SDK_URL` environment
+variable. To get started we recommend to run Ory Kratos in an Ory Cloud Project,
+which is free for developers. You can create a new project on
+[console.ory.sh](https://www.ory.sh/docs/start-building/create-project) or you
+[via the Ory CLI](https://www.ory.sh/docs/guides/cli/installation). Install the
+CLI with the package manager of your choice on
+[Linux](https://www.ory.sh/docs/guides/cli/installation#linux),
+[macOs](https://www.ory.sh/docs/guides/cli/installation#macos), or
+[Windows](https://www.ory.sh/docs/guides/cli/installation#windows).
 
+Create a new developer project with just two commands:
+
+```shell
+# Download the Ory CLI to your local directory:
+bash <(curl https://raw.githubusercontent.com/ory/meta/master/install.sh) -b . ory
+# Log into an existing account or create a new one:
+./ory auth
+# Create a new project:
+./ory create project --name <your-project-name>
 ```
+
+After the project has been created the CLI displays the project details:
+
+```shell
+Project created successfully!
+ID            a0c23a9d-bd3b-4a20-a6c0-00a1ada73f49
+SLUG	        laughing-ardinghelli-cvaggbj1hi
+STATE	        running
+NAME	        Example
+```
+
+Copy the `SLUG`, and set the `ORY_SDK_URL` to the
+[SDK URL](https://www.ory.sh/docs/concepts/services-api) of the project you just
+created:
+
+```shell
 # If you run Ory Kratos in Ory Cloud:
-export ORY_SDK_URL=https://my-project.projects.oryapis.com
+export ORY_SDK_URL=https://YOUR_PROJECT_SLUG_HERE.projects.oryapis.com
+
+# Start the app
+npm run dev
 ```
 
-You may also run Ory Kratos in a local environment. A quick way to begin is to
-run the Ory Kratos Docker quickstart:
+Next head over to [http://localhost:3000/](http://localhost:3000/) to see the
+app in action with login, registration - a working user management!
+
+### Ory Kratos on your Machine
+
+You can also run Ory Kratos on your own machine and develop in a local
+environment. A quick way to begin is to run the
+[Ory Kratos Docker quickstart](https://www.ory.sh/docs/kratos/quickstart) as it
+includes all the necessary dependencies. You can run Ory Kratos without Docker
+as well!
 
 ```shell
 git clone --depth 1 --branch master https://github.com/ory/kratos.git
@@ -137,12 +176,12 @@ git pull -ff
 docker-compose -f quickstart.yml -f contrib/quickstart/kratos/cloud/quickstart.yml up --build --force-recreate -d
 ```
 
-In that case, set the environment variable `ORY_SDK_URL` to your local Ory
+When deploying Ory Kratos yourself, set the `ORY_SDK_URL` to your local Ory
 Kratos instance:
 
 ```shell
 # If you run Ory Kratos locally using the Docker quick start:
-export ORY_KRATOS_URL=http://localhost:4455/
+export ORY_SDK_URL=http://localhost:4455/
 
 # Start the app
 npm run dev
@@ -276,7 +315,7 @@ Ory Kratos protects you from these type of attacks with the flow shown above.
 
 You've made it! Clone the app and try it out right now!
 
-```bash
+```shell
 git clone https://github.com/ory/kratos-nextjs-react-example.git
 cd kratos-nextjs-react-example
 npm i
@@ -295,7 +334,7 @@ The easiest way to deploy your Next.js app is to use the
 [Vercel Platform](https://vercel.com/new) from the creators of Next.js. If you
 have never deployed on Vercel, check out the
 [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more
-details. Deploying the app is easy. Ensure that your build works by running
+details. Ensure that your build works:
 
 ```
 npm run build
@@ -308,13 +347,19 @@ the URL of your self-hosted Ory Kratos instance in your Vercel deployment:
 
 ![Add Ory Cloud SDK URL to Vercel](/images/articles/auth-react-next-vercel/vercel-env-var.png)
 
-By the way! If you want to use separate Ory Kratos deployments for staging,
-production, and development then use different SDK URLs for the different
-environments by un/selecting the checkboxes in the Vercel UI:
+:::tip
+
+To separate Ory Kratos deployments for staging, production, and development, use
+different SDK URLs for the different environments by un/selecting the checkboxes
+in the Vercel UI:
+
+:::
 
 ![Use a development project for development Vercel](/images/articles/auth-react-next-vercel/vercel-dev.png)
 
 ![Use a production project for production Vercel](/images/articles/auth-react-next-vercel/vercel-prod.png)
+
+---
 
 If you want to call Ory Cloud's Admin APIs from your Next.js Edge serverless
 functions, optionally set up the
@@ -333,20 +378,20 @@ This also works with Vercel PR Preview!
 
 ## End-to-End Tests
 
-Adding end-to-end tests is also easy! Clone the repository and run the following
-commands:
+Adding end-to-end tests is also straightforward! Clone the repository and run
+the following commands:
 
-```bash
+```shell
 git clone https://github.com/ory/kratos-nextjs-react-example.git
 cd kratos-nextjs-react-example
 npm i
 ```
 
-Then, depending on your setup, you can either use Ory Kratos local or deployed
-in Ory Cloud:
+Then export the `ORY_SDK_URL`, as described above (switch out with your project
+`SLUG`):
 
 ```shell
-export ORY_KRATOS_URL=https://playground.projects.oryapis.com/
+export ORY_SDK_URL=https://YOUR_PROJECT_SLUG_HERE.projects.oryapis.com
 ```
 
 Then, build and start the server

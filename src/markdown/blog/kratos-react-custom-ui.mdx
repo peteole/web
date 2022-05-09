@@ -95,27 +95,66 @@ The code for this app is available on
 [GitHub](https://github.com/ory/kratos-selfservice-ui-react-nextjs). To give it
 a spin, clone it and run the following commands:
 
-```bash
+```shell
 git clone https://github.com/ory/kratos-selfservice-ui-react-nextjs.git
 cd kratos-selfservice-ui-react-nextjs
 npm i
 ```
 
-Per default, this app uses the public playground deployment of Ory Kratos at
-`https://playground.projects.oryapis.com`. If you want to use your own Ory
-Kratos instance, you can use the `ORY_KATOS_URL` or `ORY_SDK_URL` environment
-variable. The easiest way to run Ory Kratos is in an
-[Ory Cloud Project](https://www.ory.sh/docs/start-building/create-project)
-_(free for developers)_! In that case, set the `ORY_SDK_URL` to your
-[project's SDK url](https://www.ory.sh/docs/concepts/services-api):
+To use your own Ory Kratos instance, you can use the `ORY_SDK_URL` environment
+variable. To get started we recommend to run Ory Kratos in an Ory Cloud Project,
+which is free for developers. You can create a new project on
+[console.ory.sh](https://www.ory.sh/docs/start-building/create-project) or you
+[via the Ory CLI](https://www.ory.sh/docs/guides/cli/installation). Install the
+CLI with the package manager of your choice on
+[Linux](https://www.ory.sh/docs/guides/cli/installation#linux),
+[macOs](https://www.ory.sh/docs/guides/cli/installation#macos), or
+[Windows](https://www.ory.sh/docs/guides/cli/installation#windows).
 
+Create a new developer project with just two commands:
+
+```shell
+# Download the Ory CLI to your local directory:
+bash <(curl https://raw.githubusercontent.com/ory/meta/master/install.sh) -b . ory
+# install Ory CLI using cURl
+./ory auth
+# Log into an existing account or create a new one
+./ory create project --name <your-project-name>
+# Create a new project
 ```
+
+After the project has been created the CLI displays the project details:
+
+```shell
+Project created successfully!
+ID            a0c23a9d-bd3b-4a20-a6c0-00a1ada73f49
+SLUG	        laughing-ardinghelli-cvaggbj1hi
+STATE	        running
+NAME	        Example
+```
+
+Copy the `SLUG`, and set the `ORY_SDK_URL` to the
+[SDK URL](https://www.ory.sh/docs/concepts/services-api) of the project you just
+created:
+
+```shell
 # If you run Ory Kratos in Ory Cloud:
-export ORY_SDK_URL=https://my-project.projects.oryapis.com
+export ORY_SDK_URL=https://YOUR_PROJECT_SLUG_HERE.projects.oryapis.com
+
+# Start the app
+npm run dev
 ```
 
-You may also run Ory Kratos yourself. A quick way to get started is to run the
-Ory Kratos Docker quickstart:
+Next head over to [http://localhost:3000/](http://localhost:3000/) to see the
+app in action with login, registration - a working user management!
+
+### Ory Kratos on your Machine
+
+You can also run Ory Kratos on your own machine and develop in a local
+environment. A quick way to begin is to run the
+[Ory Kratos Docker quickstart](https://www.ory.sh/docs/kratos/quickstart) as it
+includes all the necessary dependencies. You can run Ory Kratos without Docker
+as well!
 
 ```shell
 git clone --depth 1 --branch master https://github.com/ory/kratos.git
@@ -135,9 +174,6 @@ export ORY_KRATOS_URL=http://localhost:4455/
 npm run dev
 ```
 
-Next head over to [http://localhost:3000/](http://localhost:3000/) to see the
-app in action with login, registration - a working user management!
-
 ### Ory Kratos Configuration in Ory Cloud
 
 To get everything to work smoothly, we recommend setting the appropriate UI
@@ -153,6 +189,14 @@ are developing locally on port `3000` this would be:
 
 ![Ory Cloud Project User Interface Configuration](/images/articles/kratos-react-vercel-next/ui-settings.png)
 
+You can also configure this (like all other Ory configuration) directly in the
+CLI, for example for the registration UI. Just switch out the flow name to
+configure the other UIs:
+
+```shell
+./ory patch project <your-project-id> --replace '/services/identity/config/selfservice/flows/registration/ui_url="http://localhost:3000/registration"'
+```
+
 Also, ensure to set up your redirects correctly, so you end up at the right
 endpoint after you have signed up or signed in!
 
@@ -167,7 +211,7 @@ set these values to your production URL!
 To start from scratch, initialize the NextJS App and install Ory's SDKs and
 integration packages:
 
-```
+```shell
 npx create-next-app --ts
 npm i --save @ory/kratos-client @ory/integrations
 ```
@@ -176,7 +220,7 @@ To make the UI beautiful, we also install Ory's theme package. You can of course
 use your own styling framework (e.g. [Material UI](https://mui.com/) or
 [Tailwind](https://tailwindcss.com/)).
 
-```
+```shell
 npm i --save @ory/themes
 ```
 
@@ -184,7 +228,7 @@ We also want to send notifications to users in case something goes wrong. For
 that, we will install
 [React Toastify](https://github.com/fkhadra/react-toastify):
 
-```
+```shell
 npm install --save react-toastify
 ```
 
@@ -271,7 +315,7 @@ Great, we have now initialized the registration flow and have everything
 prepared to render the form. Rendering the form is the same for all flows
 (login, registration, recovery, ...). The [`<Flow onSubmit={onSubmit}
 flow={flow} />` React
-Component])(https://github.com/ory/kratos-selfservice-ui-react-nextjs/blob/af4ab647b6ea3f55da359742a629dd00af1bf217/pkg/ui/Flow.tsx)
+Component](https://github.com/ory/kratos-selfservice-ui-react-nextjs/blob/af4ab647b6ea3f55da359742a629dd00af1bf217/pkg/ui/Flow.tsx)
 will render the form and handle the form state. The component itself is a bit
 longer because we deal with the form state, errors, and the form submission
 without any helper tools such as Formik. In essence, it iterates over the
@@ -380,7 +424,7 @@ That was quite a bit of code, but it's all there is to it! If you do not want to
 implement these UI screens yourself, use the reference implementations for Ory
 Kratos instead, or clone this repository and use it as a base for your project!
 
-```bash
+```shell
 git clone https://github.com/ory/kratos-selfservice-ui-react-nextjs.git
 ```
 
@@ -392,7 +436,7 @@ have never deployed on Vercel, check out the
 [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more
 details. Deploying the app is easy. Ensure that your build works by running
 
-```
+```shell
 npm run build
 ```
 
@@ -420,7 +464,7 @@ functions, optionally set up the
 Next all you need to do is to run the deploy command and connect it to the
 project you created:
 
-```
+```shell
 npx vercel deploy --prod
 ```
 
@@ -431,14 +475,14 @@ This also works with Vercel PR Preview!
 Adding end-to-end tests is also easy! Clone the repository and run the following
 commands:
 
-```bash
+```shell
 git clone https://github.com/ory/kratos-selfservice-ui-react-nextjs.git
 cd kratos-selfservice-ui-react-nextjs
 npm i
 ```
 
-Then, depending on your setup, you can either use Ory Kratos local or deployed
-in Ory Cloud:
+Then, depending on your setup, you can either use Ory Kratos local or in Ory
+Cloud:
 
 ```shell
 export ORY_KRATOS_URL=https://playground.projects.oryapis.com/
@@ -452,7 +496,7 @@ npm run dev
 
 and in a new shell run the end-to-end tests:
 
-```
+```shell
 npm run test:dev
 ```
 
