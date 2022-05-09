@@ -1,10 +1,6 @@
 import cn from 'classnames'
 import parse from 'csv-parse'
 import dateformat from 'dateformat'
-import csvHydraHitsPerMonth from 'raw-loader!../../../stats/hydra/hits-per-month.csv'
-import csvKetoHitsPerMonth from 'raw-loader!../../../stats/keto/hits-per-month.csv'
-import csvKratosHitsPerMonth from 'raw-loader!../../../stats/kratos/hits-per-month.csv'
-import csvOathkeeperHitsPerMonth from 'raw-loader!../../../stats/oathkeeper/hits-per-month.csv'
 import React, { Component } from 'react'
 
 import Container from '../../freestanding/containers/container'
@@ -24,6 +20,14 @@ const countDockerImagePulls = (state: StateTypes) =>
   Object.keys(state.docker)
     .map((repo) => state.docker[repo])
     .reduce((p: number, n: number) => p + n, 0)
+
+const fetchRequestUrl = (url: string): Promise<string> =>
+  fetch(url)
+    .then((response) => response.text())
+    .catch((err) => {
+      console.error(`An error occurred while trying to fetch the requests`, err)
+      throw err
+    })
 
 const analyze = (raw: string): Promise<number[][]> =>
   new Promise((resolve, reject) => {
@@ -73,7 +77,8 @@ const stats = (state: StateTypes) => [
   {
     title: 'Requests secured',
     amount: state.requests.amount,
-    description: `in ${dateformat(state.requests.date, 'mmmm yyyy')}`
+    //description: `until ${dateformat(state.requests.date, 'mmmm yyyy')}`
+    description: `overall`
   },
   {
     title: 'Docker pulls',
@@ -187,12 +192,14 @@ class Stats extends Component<PropTypes, StateTypes> {
   }
 
   fetchRequests() {
-    Promise.all([
-      analyze(csvHydraHitsPerMonth),
-      analyze(csvOathkeeperHitsPerMonth),
-      analyze(csvKetoHitsPerMonth),
-      analyze(csvKratosHitsPerMonth)
-    ]).then((services: number[][][]) => {
+    Promise.all(
+      [
+        'https://corsar.ory.sh/metrics-dashboard/metrics-results/hydra/hits-per-month.csv?__host=storage.googleapis.com&__proto=https',
+        'https://corsar.ory.sh/metrics-dashboard/metrics-results/oathkeeper/hits-per-month.csv?__host=storage.googleapis.com&__proto=https',
+        'https://corsar.ory.sh/metrics-dashboard/metrics-results/kratos/hits-per-month.csv?__host=storage.googleapis.com&__proto=https',
+        'https://corsar.ory.sh/metrics-dashboard/metrics-results/keto/hits-per-month.csv?__host=storage.googleapis.com&__proto=https'
+      ].map((url: string) => fetchRequestUrl(url).then(analyze))
+    ).then((services: number[][][]) => {
       const requests: { [key: number]: number } = {}
 
       services.forEach((rows) => {
@@ -203,20 +210,28 @@ class Stats extends Component<PropTypes, StateTypes> {
         })
       })
 
-      let max: number[] = [0, 0]
+      let current: number[] = [0, 0]
       Object.keys(requests).forEach((date: string) => {
         const amount = requests[parseInt(date)]
 
-        if (amount > max[1]) {
-          max = [parseInt(date), amount]
+        const timestamp = parseInt(date)
+        if (timestamp > Date.now()) {
+          return
         }
+
+        // Compute latest timestamp
+        if (timestamp > current[0]) {
+          current[0] = timestamp
+        }
+
+        current[1] = current[1] + amount
       })
 
       this.setState(() => {
         return {
           requests: {
-            amount: max[1],
-            date: new Date(max[0])
+            amount: current[1],
+            date: new Date(current[0])
           }
         }
       })
