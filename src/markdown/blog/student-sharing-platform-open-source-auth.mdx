@@ -63,10 +63,7 @@ messages sent in a typical login:
 
 Ory Kratos often works with so-called
 [_flows_](https://www.ory.sh/docs/kratos/self-service). A flow is a process that
-may consist of several steps such as account recovery or login with MFA. For
-login with username/password this may seem like an overkill since there is only
-a singe request (send credentials in exchange for session cookie), but the flow
-pattern is used to allow for MFA logins in the future.
+may consist of several steps such as account recovery or login with MFA.
 
 So the login is as follows:
 
@@ -113,7 +110,7 @@ Let's first go through the deployment of Ory Kratos itself, which we do in
 [Helmfile](https://github.com/roboll/helmfile).
 
 Ory Kratos has a [Helm Chart](https://k8s.ory.sh/helm/kratos.html) that allows
-to install it in a cluster more or less conveniently. The interesting part here
+to install it in a cluster. The interesting part here
 is how to configure Ory Kratos (set redirect links, email-credentials, and
 more). We do this by providing values to the Helm Chart in our Helmfile. All
 this is managed in our
@@ -442,7 +439,6 @@ export const LogoutButton: React.FC = props => {
 ...
 ```
 
-Is there a nicer way to handle the CSRF token? This feels a bit hacky...
 
 Right now, the flows can be finished without any further human interventions
 since they consist only of one step, but this may change with 2FA.
