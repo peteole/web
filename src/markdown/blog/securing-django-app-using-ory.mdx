@@ -1,0 +1,240 @@
+---
+templateKey: blog
+path: '/securing-django-app-using-ory/'
+author: gen1us2k
+title: Securing Your Django app using Ory
+teaser: Securing your django application with open source solutions
+subtitle: Let's build a Django application using Ory Cloud or Ory Kratos
+overline: Django authentication guide
+publishedAt: 2022-06-01
+published: true
+description: ''
+tags:
+  - Guide
+  - Authentication
+  - Ory Cloud
+  - Open Source
+  - User Management
+---
+import CodeFromRemote from '../../components/freestanding/utils/codefromremote'
+
+Using Ory Cloud with Django Framework.
+
+One can build a web application with Python programming language, and there are several
+options for choosing a web framework. We have at least two frameworks such as Django or Flask.
+[In the previous blog post](https://www.ory.sh/securing-flask-application-using-kratos-and-keto/),
+we discussed how to secure a web application using Ory Kratos. Let's do the same thing for Django.
+
+Django is a web framework for perfectionists with deadlines and can help build web
+applications quickly. It has its authentication and permissions framework, admin
+interface, and a lot of integrations with popular relational database systems such
+as PostgreSQL, Percona Server, SQLite, MySQL, and MariaDB.
+
+I love building web apps using Django because it was my first web framework, and I love its ecosystem.
+
+In this tutorial, we'll build a simple one-page application with authentication covered by Ory Cloud.
+
+_Let's start hacking, huh?_
+
+## Bootstrapping Django project
+
+Django has many ways to bootstrap a project:
+
+1. Django cookiecutter is a framework for jumpstarting production-ready Django apps. It's a useful framework generating everything you need for the Django project, including docker support, integration with Cloud storage such as S3, and many more.
+2. `django-admin` command. We'll use it because we want to build something simple, and it would be easier for local development.
+
+It would be best if you had poetry installed because it's the primary tool for managing dependencies for this tutorial.
+
+```bash
+mkdir django-ory-cloud
+cd django-ory-cloud
+poetry init
+
+This command will guide you through creating your pyproject.toml config.
+
+Package name [django-ory-cloud]:
+Version [0.1.0]:
+Description []:  An example django application with Ory Cloud as an Authentication backend
+Author [John Doe, n to skip]: John Doe
+License []:
+Compatible Python versions [^3.10]:
+
+Would you like to define your main dependencies interactively? (yes/no) [yes] no
+Would you like to define your development dependencies interactively? (yes/no) [yes] no
+Generated file
+
+[tool.poetry]
+name = "django-ory-cloud"
+version = "0.1.0"
+description = "An example django application with Ory Cloud as an Authentication backend"
+authors = ["John Doe"]
+
+[tool.poetry.dependencies]
+python = "^3.10"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry-core>=1.0.0"]
+build-backend = "poetry.core.masonry.api"
+
+
+Do you confirm generation? (yes/no) [yes] yes
+```
+
+Installing Django
+
+```bash
+poetry add Django
+Creating virtualenv django-ory-cloud-0UeuvAWs-py3.10 in /Users/gen1us2k/Library/Caches/pypoetry/virtualenvs
+Using version ^4.0.4 for Django
+
+Updating dependencies
+Resolving dependencies... (1.0s)
+
+Writing lock file
+
+Package operations: 3 installs, 0 updates, 0 removals
+
+  • Installing asgiref (3.5.1)
+  • Installing sqlparse (0.4.2)
+  • Installing django (4.0.4)
+```
+
+Creating project
+
+```bash
+poetry run django-admin startproject mysite
+```
+
+It generates the following project structure and you can learn more about the structure
+[here](https://docs.djangoproject.com/en/4.0/intro/tutorial01/#creating-a-project)
+
+```bash
+.
+├── mysite
+│   ├── manage.py
+│   └── mysite
+│       ├── __init__.py
+│       ├── asgi.py
+│       ├── settings.py
+│       ├── urls.py
+│       └── wsgi.py
+├── poetry.lock
+└── pyproject.toml
+
+2 directories, 8 files
+
+```
+
+Now it's time to install additional dependencies such as
+[`django-environ`](https://django-environ.readthedocs.io/en/latest/) to enable
+configuration via environment variables and
+[`django-ory-auth`](https://pypi.org/project/django-ory-auth/) to enable integration
+with Ory Cloud
+
+```bash
+poetry add django-environ django-ory-auth
+Using version ^0.8.1 for django-environ
+Using version ^0.1.3 for django-ory-auth
+
+Updating dependencies
+Resolving dependencies... (2.4s)
+
+Writing lock file
+
+Package operations: 7 installs, 0 updates, 0 removals
+
+  • Installing certifi (2021.10.8)
+  • Installing charset-normalizer (2.0.12)
+  • Installing idna (3.3)
+  • Installing urllib3 (1.26.9)
+  • Installing requests (2.27.1)
+  • Installing django-environ (0.8.1)
+  • Installing django-ory-auth (0.1.3)
+
+poetry shell
+cd mysite
+```
+
+## Enabling django-ory-auth package
+
+On the previous step we installed `django-ory-auth` package.
+We need to add it to the `INSTALLED_APPS` by editing `mysite/settings.py` file.
+
+```python
+# Application definition
+
+INSTALLED_APPS = [
+    'django.contrib.admin',
+    'django.contrib.auth',
+    'django.contrib.contenttypes',
+    'django.contrib.sessions',
+    'django.contrib.messages',
+    'django.contrib.staticfiles',
+    'django_ory_auth',
+]
+
+```
+Let's discuss the next steps of our integration. Django-ory-auth package comes with a
+context processor and an authentication backend. Context processor provides additional
+context such as login_url, logout_url, and many more to use in templates.
+The authentication backend replaces the default Django authentication backends because we store identity data in the remote identity provider.
+
+It works fine with `AUTH_USER_MODEL` and Django's permission framework. You can still use `is_staff` and `is_superuser` fields of the default user model.
+
+Add this to the `mysite/settings.py` file:
+
+```python
+AUTHENTICATION_BACKENDS = [
+    "django_ory_auth.backend.OryBackend",
+]
+```
+
+Django's default settings do not have an out-of-the-box configuration for templates,
+so we need to make additional changes. This example uses `mysite/templates` folder
+to store templates, and we need to make further changes.
+
+Edit `mysite/settings.py` file
+
+```python
+# Add import os to the beginning of the file
+import os
+import environ
+
+env = environ.Env()
+...
+# We need to change a couple of settings here
+TEMPLATES
+...
+        # This tells django to use `mysite/templates` dir
+        # for searching templates
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+                # Add this line to enable context processor
+                # and have variables like `login_url` available
+                # in templates
+                'django_ory_auth.context.processor',
+            ],
+        },
+...
+```
+
+
+## Setting up Ory Cloud
+
+Okay. We need to have an Ory Cloud project and install ory cli
+tool for the next steps. You can follow the following guides
+
+1. [Creating a project](https://www.ory.sh/docs/guides/console/create-project)
+2. [Installing cli](https://www.ory.sh/docs/guides/cli/installation)
+
+As a next step, you need to copy Ory Kratos URL. You can find it by opening `Connect` from the sidebar of the https://console.ory.sh.
+The URL follows this pattern `https://projectid.project.oryapis.com`
+
