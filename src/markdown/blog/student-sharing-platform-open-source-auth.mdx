@@ -273,7 +273,7 @@ fill in their credentials, register or reset their password. When the
 credentials are entered, the corresponding flow is started using the
 [Ory Kratos JS SDK](https://www.ory.sh/docs/kratos/sdk).
 
-```tsx<fr
+```tsx
 import React, { useEffect, useState } from 'react';
 import type { Identity, UiContainer, V0alpha2Api } from '@ory/kratos-client'
 let _api: V0alpha2Api | undefined
@@ -469,8 +469,7 @@ const endpointLink = new HttpLink({
   uri: clientConfig.gqlUrl,
   credentials: 'include'
 })
-scribe to this to display the authentication popup when needing authentication
-expor
+// Subscribe to this to display the authentication popup when needing authentication
 export const authenticationStream = new PushStream<AuthenticationRequest>()
 const LoginLink = new ApolloLink((operation, forward) => {
   const observable = endpointLink.request(operation)
