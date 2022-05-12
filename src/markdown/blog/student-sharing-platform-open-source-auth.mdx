@@ -86,11 +86,16 @@ associate it with a session of the UI in a web browser so that the user can
 reset their password in the UI, and all with minimal knowledge of the specific
 app architecture.
 
-They solved this by hosting Ory Kratos on the same domain as the app itself and
-using _redirects_. For instance our UI is hosted under
-`https://huddle.hsg.fs.tum.de/ui` whereas Ory Kratos is hosted under
-`https://huddle.hsg.fs.tum.de/.ory/kratos`. The messages exchanged are as
-follows:
+Ory Kratos makes the redirect URLs and cookie domain configurable so that after
+a recovery request the browser will redirect to the front-end with all of the
+correct cookies set. For instance Kratos can be run on a sub-domain such as
+https://kratos.example.com and the front-end on https://example.com. The cookies
+can then be configured to the Top-Level Domain (TLD) https://example.com. In our
+case we opted for hosting Kratos and our front-end app on the same domain, but
+separate it using a different URL path. Our front-end is hosted on
+https://huddle.hsg.fs.tum.de/ui and Ory Kratos on
+https://huddle.hsg.fs.tum.de/.ory/kratos. The messages exchanged between
+frontend and Ory Kratos are as follows:
 
 1. User clicks recovery link in the format
    `https://huddle.hsg.fs.tum.de/.ory/kratos/self-service/recovery?flow=6b817dhf-4717-48we-a756-cd7902b43ce6&token=QiGjssJcvB08H7cUdE3tyXvQr1i4OSaR`.
